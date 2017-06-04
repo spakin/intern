@@ -12,28 +12,34 @@ import (
 // enforce that property, however.)
 type EqSymbol uint64
 
-// eqSymbolTostring maintains the mapping from EqSymbols to strings.
-var eqSymbolToString = make(map[EqSymbol]string)
+// eqSymbolState maintains all the state needed to manipulate EqSymbols.
+var eqSymbolState struct {
+	symToStr map[EqSymbol]string // Mapping from EqSymbols to strings
+	strToSym map[string]EqSymbol // Mapping from strings to EqSymbols
+}
 
-// stringToEqSymbol maintains the mapping from strings to EqSymbols.
-var stringToEqSymbol = make(map[string]EqSymbol)
+// init initializes our global state.
+func init() {
+	eqSymbolState.symToStr = make(map[EqSymbol]string)
+	eqSymbolState.strToSym = make(map[string]EqSymbol)
+}
 
 // NewEqSymbol maps a string to an EqSymbol.  It guarantees that the same
 // string contents will always return the same EqSymbol.
 func NewEqSymbol(s string) EqSymbol {
-	if sym, ok := stringToEqSymbol[s]; ok {
+	if sym, ok := eqSymbolState.strToSym[s]; ok {
 		return sym
 	}
-	sym := EqSymbol(len(eqSymbolToString) + 1) // Reserve 0 to help catch program errors.
-	eqSymbolToString[sym] = s
-	stringToEqSymbol[s] = sym
+	sym := EqSymbol(len(eqSymbolState.symToStr) + 1) // Reserve 0 to help catch program errors.
+	eqSymbolState.symToStr[sym] = s
+	eqSymbolState.strToSym[s] = sym
 	return sym
 }
 
 // String converts an EqSymbol back to a string.  It panics if given an invalid
 // input.
 func (s EqSymbol) String() string {
-	if str, ok := eqSymbolToString[s]; ok {
+	if str, ok := eqSymbolState.symToStr[s]; ok {
 		return str
 	} else {
 		panic(fmt.Sprintf("%d is not a valid EqSymbol", s))
