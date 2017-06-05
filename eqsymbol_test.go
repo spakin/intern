@@ -84,3 +84,35 @@ func TestBadEqSymbol(t *testing.T) {
 	_ = bad.String() // Should panic
 	t.Errorf("Failed to catch invalid EqSymbol %d", bad)
 }
+
+// TestEqSymbolCase ensures that symbol comparisons are case-sensitive.
+func TestEqSymbolCase(t *testing.T) {
+	// Convert a set of strings to EqSymbols.
+	strs := []string{
+		"roadrunner",
+		"Roadrunner",
+		"roadRunner",
+		"ROADRUNNER",
+		"rOaDrUnNeR",
+		"ROADrunner",
+		"roadRUNNER",
+	}
+	syms := make([]intern.EqSymbol, len(strs))
+	for i, s := range strs {
+		syms[i] = intern.NewEqSymbol(s)
+	}
+
+	// Ensure that each symbol is equal only to itself.
+	numEq := 0
+	for _, s1 := range syms {
+		for _, s2 := range syms {
+			if s1 == s2 {
+				numEq++
+			}
+		}
+	}
+	if numEq != len(syms) {
+		t.Errorf("Expected %d case-sensitive comparisons but saw %d",
+			len(syms), numEq)
+	}
+}
