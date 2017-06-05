@@ -9,10 +9,10 @@ import (
 	"sync"
 )
 
-// An EqC is a string that has been interned to an integer.  EqC supports only
-// equality comparisons, not inequality comparisons.  (No checks are performed
-// to enforce that property, unfortunately.)  Unlike Eq, equality comparisons
-// are insensitive to a transformation function provided to NewEqC.
+// An EqC is a string that has been interned to an integer after being
+// canonicalized using a program-provided transformation function.  EqC
+// supports only equality comparisons, not inequality comparisons.  (No checks
+// are performed to enforce that property, unfortunately.)
 //
 // It is strongly recommended that programs alias EqC once for each
 // transformation function.  This will help the compiler catch program errors

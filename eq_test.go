@@ -82,7 +82,7 @@ func TestBadEq(t *testing.T) {
 	defer func() { _ = recover() }()
 	var bad intern.Eq
 	_ = bad.String() // Should panic
-	t.Errorf("Failed to catch invalid Eq %d", bad)
+	t.Errorf("Failed to catch invalid intern.Eq %d", bad)
 }
 
 // TestEqCase ensures that symbol comparisons are case-sensitive.
