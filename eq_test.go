@@ -70,8 +70,9 @@ func TestEqString(t *testing.T) {
 	// Eq might be converted to a string.
 	for i, str := range strs {
 		sym := syms[i]
-		if str != fmt.Sprintf("%s", sym) {
-			t.Errorf("Expected %q but saw %q", str, sym)
+		sStr := fmt.Sprintf("%s", sym)
+		if str != sStr {
+			t.Errorf("Expected %q but saw %q", str, sStr)
 		}
 	}
 }

@@ -34,7 +34,7 @@ func TestEqCString(t *testing.T) {
 
 	// Generate a bunch of strings.
 	for i := range strs {
-		nc := prng.Intn(20) + 1 // Number of characters
+		nc := prng.Intn(25) + 45 // Number of characters; large enough that conflicts are exceedingly unlikely
 		strs[i] = randomString(prng, nc)
 	}
 
@@ -48,10 +48,9 @@ func TestEqCString(t *testing.T) {
 	// EqC might be converted to a string.
 	for i, str := range strs {
 		sym := syms[i]
-		lstr := strings.ToLower(str)
-		lsym := strings.ToLower(fmt.Sprintf("%s", sym))
-		if lstr != lsym {
-			t.Errorf("Expected %q but saw %q", lstr, lsym)
+		sStr := fmt.Sprintf("%s", sym)
+		if str != sStr {
+			t.Errorf("Expected %q but saw %q", str, sStr)
 		}
 	}
 }
@@ -77,13 +76,15 @@ func TestEqCCase(t *testing.T) {
 		"rOaDrUnNeR",
 		"ROADrunner",
 		"roadRUNNER",
+		"Coyote",
 	}
 	syms := make([]intern.EqC, len(strs))
 	for i, s := range strs {
 		syms[i] = intern.NewEqC(s, strings.ToUpper)
 	}
 
-	// Ensure that each symbol is equal to all the other symbols.
+	// Ensure that each "Roadrunner" is equal to all the other
+	// "Roadrunner"s but not equal to any of the "Coyote"s.
 	numEqC := 0
 	for _, s1 := range syms {
 		for _, s2 := range syms {
@@ -92,8 +93,9 @@ func TestEqCCase(t *testing.T) {
 			}
 		}
 	}
-	if numEqC != len(syms)*len(syms) {
+	expected := (len(syms)-1)*(len(syms)-1) + 1
+	if numEqC != expected {
 		t.Errorf("Expected %d case-insensitive comparisons but saw %d",
-			len(syms)*len(syms), numEqC)
+			expected, numEqC)
 	}
 }
