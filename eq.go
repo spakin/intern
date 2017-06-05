@@ -8,13 +8,13 @@ import (
 	"sync"
 )
 
-// An Eq is represented by an integer.  It supports only equality
-// comparisons, not inequality comparisons.  (No checks are performed to
-// enforce that property, however.)
+// An Eq is a string that has been interned to an integer.  Eq
+// supports only equality comparisons, not inequality comparisons.
+// (No checks are performed to enforce that property, unfortunately.)
 type Eq uint64
 
-// eqSymbolState maintains all the state needed to manipulate Eqs.
-var eqSymbolState struct {
+// eqState maintains all the state needed to manipulate Eqs.
+var eqState struct {
 	symToStr     map[Eq]string // Mapping from Eqs to strings
 	strToSym     map[string]Eq // Mapping from strings to Eqs
 	sync.RWMutex               // Mutex protecting both of the above
@@ -22,30 +22,30 @@ var eqSymbolState struct {
 
 // init initializes our global state.
 func init() {
-	eqSymbolState.symToStr = make(map[Eq]string)
-	eqSymbolState.strToSym = make(map[string]Eq)
+	eqState.symToStr = make(map[Eq]string)
+	eqState.strToSym = make(map[string]Eq)
 }
 
 // NewEq maps a string to an Eq.  It guarantees that the same
 // string contents will always return the same Eq.
 func NewEq(s string) Eq {
-	eqSymbolState.Lock()
-	defer eqSymbolState.Unlock()
-	if sym, ok := eqSymbolState.strToSym[s]; ok {
+	eqState.Lock()
+	defer eqState.Unlock()
+	if sym, ok := eqState.strToSym[s]; ok {
 		return sym
 	}
-	sym := Eq(len(eqSymbolState.symToStr) + 1) // Reserve 0 to help catch program errors.
-	eqSymbolState.symToStr[sym] = s
-	eqSymbolState.strToSym[s] = sym
+	sym := Eq(len(eqState.symToStr) + 1) // Reserve 0 to help catch program errors.
+	eqState.symToStr[sym] = s
+	eqState.strToSym[s] = sym
 	return sym
 }
 
-// String converts an Eq back to a string.  It panics if given an invalid
-// input.
+// String converts an Eq back to a string.  It panics if given an Eq that was
+// not created using NewEq.
 func (s Eq) String() string {
-	eqSymbolState.RLock()
-	defer eqSymbolState.RUnlock()
-	if str, ok := eqSymbolState.symToStr[s]; ok {
+	eqState.RLock()
+	defer eqState.RUnlock()
+	if str, ok := eqState.symToStr[s]; ok {
 		return str
 	}
 	panic(fmt.Sprintf("%d is not a valid intern.Eq", s))
