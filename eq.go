@@ -1,6 +1,6 @@
-/*
-Package intern maps symbols to integers for fast comparisons.
-*/
+// This file provides the Eq type, which represents strings that can
+// be compared only for equality.
+
 package intern
 
 import (
