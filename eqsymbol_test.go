@@ -1,4 +1,4 @@
-// This file includes unit tests for the EqSymbol data type.
+// This file includes unit tests for the Eq data type.
 
 package intern_test
 
@@ -34,24 +34,24 @@ func randomString(r *rand.Rand, n int) string {
 	return string(rs)
 }
 
-// TestNewEqSymbol tests if we can create a large number of symbols for which
+// TestNewEq tests if we can create a large number of symbols for which
 // duplicates are certain to occur.
-func TestNewEqSymbol(*testing.T) {
+func TestNewEq(*testing.T) {
 	const sLen = 3                       // Symbol length in characters
 	const nSymbols = 1000000             // Must be greater than len(charSet) choose sLen
 	prng := rand.New(rand.NewSource(12)) // Constant for reproducibility
 	for i := 0; i < nSymbols; i++ {
-		_ = intern.NewEqSymbol(randomString(prng, sLen))
+		_ = intern.NewEq(randomString(prng, sLen))
 	}
 }
 
-// TestEqSymbolString tests if we can convert strings to symbols and back to
+// TestEqString tests if we can convert strings to symbols and back to
 // strings.
-func TestEqSymbolString(t *testing.T) {
+func TestEqString(t *testing.T) {
 	// Prepare the test.
 	const ns = 10000                     // Number of strings to generate
 	strs := make([]string, ns)           // Original strings
-	syms := make([]intern.EqSymbol, ns)  // Interned strings
+	syms := make([]intern.Eq, ns)        // Interned strings
 	prng := rand.New(rand.NewSource(34)) // Constant for reproducibility
 
 	// Generate a bunch of strings.
@@ -60,14 +60,14 @@ func TestEqSymbolString(t *testing.T) {
 		strs[i] = randomString(prng, nc)
 	}
 
-	// Intern each string to an EqSymbol.
+	// Intern each string to an Eq.
 	for i, s := range strs {
-		syms[i] = intern.NewEqSymbol(s)
+		syms[i] = intern.NewEq(s)
 	}
 
-	// Ensure that converting an EqSymbol back to a string is a lossless
+	// Ensure that converting an Eq back to a string is a lossless
 	// operation.  We use fmt.Sprintf as this represents a typical way an
-	// EqSymbol might be converted to a string.
+	// Eq might be converted to a string.
 	for i, str := range strs {
 		sym := syms[i]
 		if str != fmt.Sprintf("%s", sym) {
@@ -76,18 +76,18 @@ func TestEqSymbolString(t *testing.T) {
 	}
 }
 
-// TestBadEqSymbol ensures we panic when converting an invalid EqSymbol to a
+// TestBadEq ensures we panic when converting an invalid Eq to a
 // string.
-func TestBadEqSymbol(t *testing.T) {
+func TestBadEq(t *testing.T) {
 	defer func() { _ = recover() }()
-	var bad intern.EqSymbol
+	var bad intern.Eq
 	_ = bad.String() // Should panic
-	t.Errorf("Failed to catch invalid EqSymbol %d", bad)
+	t.Errorf("Failed to catch invalid Eq %d", bad)
 }
 
-// TestEqSymbolCase ensures that symbol comparisons are case-sensitive.
-func TestEqSymbolCase(t *testing.T) {
-	// Convert a set of strings to EqSymbols.
+// TestEqCase ensures that symbol comparisons are case-sensitive.
+func TestEqCase(t *testing.T) {
+	// Convert a set of strings to Eqs.
 	strs := []string{
 		"roadrunner",
 		"Roadrunner",
@@ -97,9 +97,9 @@ func TestEqSymbolCase(t *testing.T) {
 		"ROADrunner",
 		"roadRUNNER",
 	}
-	syms := make([]intern.EqSymbol, len(strs))
+	syms := make([]intern.Eq, len(strs))
 	for i, s := range strs {
-		syms[i] = intern.NewEqSymbol(s)
+		syms[i] = intern.NewEq(s)
 	}
 
 	// Ensure that each symbol is equal only to itself.

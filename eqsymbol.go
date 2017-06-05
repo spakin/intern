@@ -8,45 +8,45 @@ import (
 	"sync"
 )
 
-// An EqSymbol is represented by an integer.  It supports only equality
+// An Eq is represented by an integer.  It supports only equality
 // comparisons, not inequality comparisons.  (No checks are performed to
 // enforce that property, however.)
-type EqSymbol uint64
+type Eq uint64
 
-// eqSymbolState maintains all the state needed to manipulate EqSymbols.
+// eqSymbolState maintains all the state needed to manipulate Eqs.
 var eqSymbolState struct {
-	symToStr     map[EqSymbol]string // Mapping from EqSymbols to strings
-	strToSym     map[string]EqSymbol // Mapping from strings to EqSymbols
-	sync.RWMutex                     // Mutex protecting both of the above
+	symToStr     map[Eq]string // Mapping from Eqs to strings
+	strToSym     map[string]Eq // Mapping from strings to Eqs
+	sync.RWMutex               // Mutex protecting both of the above
 }
 
 // init initializes our global state.
 func init() {
-	eqSymbolState.symToStr = make(map[EqSymbol]string)
-	eqSymbolState.strToSym = make(map[string]EqSymbol)
+	eqSymbolState.symToStr = make(map[Eq]string)
+	eqSymbolState.strToSym = make(map[string]Eq)
 }
 
-// NewEqSymbol maps a string to an EqSymbol.  It guarantees that the same
-// string contents will always return the same EqSymbol.
-func NewEqSymbol(s string) EqSymbol {
+// NewEq maps a string to an Eq.  It guarantees that the same
+// string contents will always return the same Eq.
+func NewEq(s string) Eq {
 	eqSymbolState.Lock()
 	defer eqSymbolState.Unlock()
 	if sym, ok := eqSymbolState.strToSym[s]; ok {
 		return sym
 	}
-	sym := EqSymbol(len(eqSymbolState.symToStr) + 1) // Reserve 0 to help catch program errors.
+	sym := Eq(len(eqSymbolState.symToStr) + 1) // Reserve 0 to help catch program errors.
 	eqSymbolState.symToStr[sym] = s
 	eqSymbolState.strToSym[s] = sym
 	return sym
 }
 
-// String converts an EqSymbol back to a string.  It panics if given an invalid
+// String converts an Eq back to a string.  It panics if given an invalid
 // input.
-func (s EqSymbol) String() string {
+func (s Eq) String() string {
 	eqSymbolState.RLock()
 	defer eqSymbolState.RUnlock()
 	if str, ok := eqSymbolState.symToStr[s]; ok {
 		return str
 	}
-	panic(fmt.Sprintf("%d is not a valid EqSymbol", s))
+	panic(fmt.Sprintf("%d is not a valid intern.Eq", s))
 }
