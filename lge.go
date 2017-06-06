@@ -21,11 +21,20 @@ var lgeState struct {
 	sync.RWMutex                // Mutex protecting all of the above
 }
 
-// init initializes our global state.
-func init() {
+// forgetAllLGE discards all extant string/symbol mappings and resets the
+// assignment tables to their initial state.
+func forgetAllLGE() {
+	lgeState.Lock()
 	lgeState.symToStr = make(map[LGE]string)
 	lgeState.strToSym = make(map[string]LGE)
+	lgeState.tree = nil
 	lgeState.pending = make([]string, 0, 100)
+	lgeState.Unlock()
+}
+
+// init initializes our global state.
+func init() {
+	forgetAllLGE()
 }
 
 // PreLGE provides advance notice of a string that will be interned using
