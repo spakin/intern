@@ -26,8 +26,8 @@ func init() {
 	eqState.strToSym = make(map[string]Eq)
 }
 
-// NewEq maps a string to an Eq.  It guarantees that the same
-// string contents will always return the same Eq.
+// NewEq maps a string to an Eq symbol.  It guarantees that the same string
+// contents will always return the same symbol.
 func NewEq(s string) Eq {
 	eqState.Lock()
 	defer eqState.Unlock()
