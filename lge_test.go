@@ -1,5 +1,4 @@
-// This file includes unit tests for the LGE data type.  It reuses some of the
-// global state defined in eq_test.go
+// This file includes unit tests for the LGE data type.
 
 package intern_test
 
