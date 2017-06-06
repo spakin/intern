@@ -29,16 +29,15 @@ func (t *tree) insertHelper(s string, val, incr uint64) (*tree, error) {
 	if incr == 0 {
 		return nil, fmt.Errorf("Unable to insert %q; sub-tree is full", s)
 	}
-	nt := *t
 	var err error
 	switch {
 	case s == t.str:
 	case s < t.str:
-		nt.left, err = t.insertHelper(s, val-incr, incr/2)
+		t.left, err = t.left.insertHelper(s, val-incr, incr/2)
 	case s > t.str:
-		nt.right, err = t.insertHelper(s, val+incr, incr/2)
+		t.right, err = t.right.insertHelper(s, val+incr, incr/2)
 	}
-	return &nt, err
+	return t, err
 }
 
 // insertMany inserts a list of strings into a tree, attempting to maintain
