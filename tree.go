@@ -74,13 +74,13 @@ func (t *tree) insertManySorted(ss []string) (*tree, error) {
 		return nil, err
 	}
 	if mid > 0 {
-		tNew.left, err = t.insertManySorted(ss[:mid])
+		tNew, err = tNew.insertManySorted(ss[:mid])
 		if err != nil {
 			return nil, err
 		}
 	}
 	if mid+1 <= n {
-		tNew.right, err = t.insertManySorted(ss[mid+1:])
+		tNew, err = tNew.insertManySorted(ss[mid+1:])
 		if err != nil {
 			return nil, err
 		}
