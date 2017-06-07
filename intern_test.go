@@ -6,3 +6,8 @@ package intern
 func ForgetAllLGE() {
 	forgetAllLGE()
 }
+
+// ForgetAllLGEC provides access to the package-internal forgetAllLGEC function.
+func ForgetAllLGEC() {
+	forgetAllLGEC()
+}
