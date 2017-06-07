@@ -152,3 +152,39 @@ func TestBadLGE(t *testing.T) {
 	_ = bad.String() // Should panic
 	t.Errorf("Failed to catch invalid intern.LGE %d", bad)
 }
+
+// TestLGECase ensures that symbol comparisons are case-sensitive.
+func TestLGECase(t *testing.T) {
+	// Convert a set of strings to LGEs.
+	strs := []string{
+		"roadrunner",
+		"Roadrunner",
+		"roadRunner",
+		"ROADRUNNER",
+		"rOaDrUnNeR",
+		"ROADrunner",
+		"roadRUNNER",
+	}
+	syms := make([]intern.LGE, len(strs))
+	var err error
+	for i, s := range strs {
+		syms[i], err = intern.NewLGE(s)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Ensure that each symbol is equal only to itself.
+	numLGE := 0
+	for _, s1 := range syms {
+		for _, s2 := range syms {
+			if s1 == s2 {
+				numLGE++
+			}
+		}
+	}
+	if numLGE != len(syms) {
+		t.Errorf("Expected %d case-sensitive comparisons but saw %d",
+			len(syms), numLGE)
+	}
+}
