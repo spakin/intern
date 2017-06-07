@@ -4,6 +4,7 @@
 package intern
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -84,4 +85,15 @@ func NewLGE(s string) (LGE, error) {
 	st.symToStr[sym] = s
 	st.strToSym[s] = sym
 	return sym, nil
+}
+
+// String converts an LGE back to a string.  It panics if given an LGE that was
+// not created using NewLGE.
+func (s LGE) String() string {
+	lgeState.RLock()
+	defer lgeState.RUnlock()
+	if str, ok := lgeState.symToStr[s]; ok {
+		return str
+	}
+	panic(fmt.Sprintf("%d is not a valid intern.LGE", s))
 }
