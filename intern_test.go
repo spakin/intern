@@ -4,7 +4,7 @@ package intern
 
 // ForgetAllLGE provides access to the package-internal forgetAllLGE function.
 func ForgetAllLGE() {
-	forgetAllLGE()
+	lge.forgetAll()
 }
 
 // ForgetAllLGEC provides access to the package-internal forgetAllLGEC function.

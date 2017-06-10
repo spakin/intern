@@ -28,6 +28,10 @@ func (st *state) forgetAll() {
 	st.Unlock()
 }
 
+// id is the identity function (string → string).  It's used when no string
+// canonicalization is required.
+func id(s string) string { return s }
+
 // toString converts a symbol back to a string.  It panics if given a symbol
 // that was not created using New*.
 func (st *state) toString(s uint64, ty string) string {
