@@ -48,7 +48,7 @@ func TestEqString(t *testing.T) {
 		sym := syms[i]
 		sStr := fmt.Sprintf("%s", sym)
 		if str != sStr {
-			t.Errorf("Expected %q but saw %q", str, sStr)
+			t.Fatalf("Expected %q but saw %q", str, sStr)
 		}
 	}
 }
@@ -59,7 +59,7 @@ func TestBadEq(t *testing.T) {
 	defer func() { _ = recover() }()
 	var bad intern.Eq
 	_ = bad.String() // Should panic
-	t.Errorf("Failed to catch invalid intern.Eq %d", bad)
+	t.Fatalf("Failed to catch invalid intern.Eq %d", bad)
 }
 
 // TestEqCase ensures that symbol comparisons are case-sensitive.
@@ -89,7 +89,7 @@ func TestEqCase(t *testing.T) {
 		}
 	}
 	if numEq != len(syms) {
-		t.Errorf("Expected %d case-sensitive comparisons but saw %d",
+		t.Fatalf("Expected %d case-sensitive comparisons but saw %d",
 			len(syms), numEq)
 	}
 }

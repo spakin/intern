@@ -29,3 +29,13 @@ func randomString(r *rand.Rand, n int) string {
 	}
 	return string(rs)
 }
+
+// reverseString returns a string with its characters reversed.
+func reverseString(s string) string {
+	rs := []rune(s)
+	nr := len(rs)
+	for i := nr / 2; i >= 0; i-- {
+		rs[i], rs[nr-i-1] = rs[nr-i-1], rs[i]
+	}
+	return string(rs)
+}

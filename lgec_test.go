@@ -5,6 +5,7 @@ package intern_test
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"strings"
 	"testing"
 
@@ -131,7 +132,7 @@ func TestLGECString(t *testing.T) {
 	for i, s := range strs {
 		syms[i], err = intern.NewLGEC(s, f)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	}
 
@@ -142,7 +143,7 @@ func TestLGECString(t *testing.T) {
 		sym := syms[i]
 		sStr := fmt.Sprintf("%s", sym)
 		if f(str) != f(sStr) {
-			t.Errorf("Expected %q but saw %q", str, sStr)
+			t.Fatalf("Expected %q but saw %q", str, sStr)
 		}
 	}
 }
@@ -152,7 +153,7 @@ func TestBadLGEC(t *testing.T) {
 	defer func() { _ = recover() }()
 	var bad intern.LGEC
 	_ = bad.String() // Should panic
-	t.Errorf("Failed to catch invalid intern.LGEC %d", bad)
+	t.Fatalf("Failed to catch invalid intern.LGEC %d", bad)
 }
 
 // TestLGECCase ensures that symbol comparisons are case-sensitive.
@@ -189,7 +190,58 @@ func TestLGECCase(t *testing.T) {
 	}
 	expected := (len(syms)-1)*(len(syms)-1) + 1
 	if numLGEC != expected {
-		t.Errorf("Expected %d case-insensitive comparisons but saw %d",
+		t.Fatalf("Expected %d case-insensitive comparisons but saw %d",
 			expected, numLGEC)
+	}
+}
+
+// TestSortLGECs generates a bunch of random LGECs and sorts them.
+func TestSortLGECs(t *testing.T) {
+	// Prepare the test.
+	f := reverseString                     // Function to apply
+	const ns = 1000                        // Number of strings to generate
+	strs := make(sort.StringSlice, ns)     // Original strings
+	syms := make(intern.LGECSlice, ns)     // Interned strings
+	prng := rand.New(rand.NewSource(1718)) // Constant for reproducibility
+
+	// Generate a bunch of strings.
+	for i := range strs {
+		nc := prng.Intn(20) + 1 // Number of characters
+		strs[i] = randomString(prng, nc)
+	}
+	strs[5] = strs[ns-5] // Ensure at least one duplicate entry.
+
+	// Intern each string to an LGEC.
+	for _, s := range strs {
+		intern.PreLGEC(s, f)
+	}
+	var err error
+	for i, s := range strs {
+		syms[i], err = intern.NewLGEC(s, f)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Sort the list of LGECs and ensure that it's sorted.
+	syms.Sort()
+	for i, s := range syms[:syms.Len()-1] {
+		if s > syms[i+1] {
+			t.Fatalf("Symbols %q (%d) and %q (%d) are out of order",
+				s, i, syms[i+1], i+1)
+		}
+	}
+
+	// Sort the list of strings and ensure that it matches the
+	// sorted list of LGECs.
+	for i, str := range strs {
+		strs[i] = f(str)
+	}
+	strs.Sort()
+	for i, str := range strs {
+		sym := syms[i]
+		if f(str) != sym.String() {
+			t.Fatalf("Sorted arrays don't match (%q != %q)", f(str), sym.String())
+		}
 	}
 }
