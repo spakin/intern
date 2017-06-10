@@ -56,7 +56,7 @@ var bMarkFunc = strings.ToUpper
 func generateSimilarStrings(n int) []string {
 	strs := make([]string, n)
 	for i := range strs {
-		strs[i] = fmt.Sprintf("String comparisons can be slow when the strings to compare have a long prefix in common.  My favorite number is %15d.", i+1)
+		strs[i] = fmt.Sprintf("String comparisons can be slow when the strings to compare have a long prefix in common.  My favorite number is now %015d.", i+1)
 	}
 	return strs
 }
