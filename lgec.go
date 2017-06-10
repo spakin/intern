@@ -9,6 +9,10 @@ package intern
 // canonicalized using a program-provided transformation function.  An LGEC
 // supports less than, greater than, and equal to comparisons (<, <=, >, >=,
 // ==, !=) with other LGECs.
+//
+// It is strongly recommended that programs alias LGEC once for each
+// transformation function.  This will help the compiler catch program errors
+// if strings interned using different transformation functions are compared.
 type LGEC uint64
 
 // lgec maintains all the state needed to manipulate LGECs.
