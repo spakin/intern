@@ -82,7 +82,15 @@ func (st *state) assignSymbol(s string, f func(string) string, useTree bool) (ui
 	} else {
 		// Assign the next available number, starting at 1 to ensure
 		// that an uninitialized symbol is treated as invalid.
-		sym = uint64(len(st.symToStr)) + 1
+		var ok bool
+		sym, ok = st.strToSym[fs]
+		if ok {
+			// The string was already assigned a symbol.
+			return sym, nil
+		} else {
+			// This is the first time we've seen the string.
+			sym = uint64(len(st.symToStr)) + 1
+		}
 	}
 	st.symToStr[sym] = s  // Use the original string when mapping a symbol to a string.
 	st.strToSym[fs] = sym // Use the transformed string when mapping a string to a symbol.
