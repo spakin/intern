@@ -9,5 +9,5 @@ func ForgetAllLGE() {
 
 // ForgetAllLGEC provides access to the package-internal forgetAllLGEC function.
 func ForgetAllLGEC() {
-	forgetAllLGEC()
+	lgec.forgetAll()
 }
