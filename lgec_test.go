@@ -199,7 +199,7 @@ func TestLGECCase(t *testing.T) {
 func TestSortLGECs(t *testing.T) {
 	// Prepare the test.
 	f := reverseString                     // Function to apply
-	const ns = 1000                        // Number of strings to generate
+	const ns = 10                          // Number of strings to generate
 	strs := make(sort.StringSlice, ns)     // Original strings
 	syms := make(intern.LGECSlice, ns)     // Interned strings
 	prng := rand.New(rand.NewSource(1718)) // Constant for reproducibility
@@ -240,8 +240,8 @@ func TestSortLGECs(t *testing.T) {
 	strs.Sort()
 	for i, str := range strs {
 		sym := syms[i]
-		if f(str) != sym.String() {
-			t.Fatalf("Sorted arrays don't match (%q != %q)", f(str), sym.String())
+		if str != f(sym.String()) {
+			t.Fatalf("Sorted arrays don't match (%q != %q)", str, f(sym.String()))
 		}
 	}
 }
