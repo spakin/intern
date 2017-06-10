@@ -20,8 +20,8 @@ func init() {
 	eq.forgetAll()
 }
 
-// NewEq maps a string to an Eq symbol.  It guarantees that two strings that
-// are equal after being passed through a function f will return the same Eq.
+// NewEq maps a string to an Eq symbol.  It guarantees that two equal strings
+// will always map to the same Eq.
 func NewEq(s string) Eq {
 	var err error
 	st := &eq

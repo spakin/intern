@@ -34,8 +34,8 @@ func PreLGEC(s string, f func(string) string) {
 }
 
 // NewLGEC maps a string to an LGEC symbol.  It guarantees that two strings
-// that are equal after being passed through a function f will return the same
-// LGEC.  However, it is possible that the package cannot accomodate a
+// that compare equal after being passed through a function f will return the
+// same LGEC.  However, it is possible that the package cannot accomodate a
 // particular string, in which case NewLGEC returns a non-nil error.
 // Pre-allocate as many LGECs as possible using PreLGEC to reduce the
 // likelihood of this happening.

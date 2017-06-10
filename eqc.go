@@ -27,7 +27,8 @@ func init() {
 }
 
 // NewEqC maps a string to an EqC symbol.  It guarantees that two strings that
-// are equal after being passed through a function f will return the same EqC.
+// compare equal after being passed through a function f will map to the same
+// EqC.
 func NewEqC(s string, f func(string) string) EqC {
 	var err error
 	st := &eqc
