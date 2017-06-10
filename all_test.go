@@ -3,7 +3,9 @@
 package intern_test
 
 import (
+	"fmt"
 	"math/rand"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -38,4 +40,34 @@ func reverseString(s string) string {
 		rs[i], rs[nr-i-1] = rs[nr-i-1], rs[i]
 	}
 	return string(rs)
+}
+
+// Dummy is used to prevent benchmarks from being treated as dead code.
+var Dummy uint64
+
+// nComp is the number of strings to compare all the others to when benchmarking.
+const nComp = 1000
+
+// bMarkFunc is a string canonicalization function to use during benchmarking.
+var bMarkFunc = strings.ToUpper
+
+// generateSimilarStrings generates a list of strings that have a substantial
+// prefix in common.
+func generateSimilarStrings(n int) []string {
+	strs := make([]string, n)
+	for i := range strs {
+		strs[i] = fmt.Sprintf("String comparisons can be slow when the strings to compare have a long prefix in common.  My favorite number is %15d.", i+1)
+	}
+	return strs
+}
+
+// generateRandomStrings generates a list of long strings with random content.
+func generateRandomStrings(n int) []string {
+	prng := rand.New(rand.NewSource(1920)) // Constant for reproducibility
+	strs := make([]string, n)
+	for i := range strs {
+		nc := prng.Intn(50) + 10 // Number of characters
+		strs[i] = randomString(prng, nc)
+	}
+	return strs
 }
