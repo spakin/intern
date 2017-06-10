@@ -5,6 +5,10 @@
 
 package intern
 
+import (
+	"sort"
+)
+
 // An LGEC is a string that has been interned to an integer after being
 // canonicalized using a program-provided transformation function.  An LGEC
 // supports less than, greater than, and equal to comparisons (<, <=, >, >=,
@@ -60,4 +64,27 @@ func NewLGEC(s string, f func(string) string) (LGEC, error) {
 // not created using NewLGEC.
 func (s LGEC) String() string {
 	return lgec.toString(uint64(s), "LGEC")
+}
+
+// LGECSlice is a slice of LGECs that implements sort.Interface.
+type LGECSlice []LGEC
+
+// Len returns the length of an LGECSlice.
+func (ls LGECSlice) Len() int { return len(ls) }
+
+// Less reports whether one element of an LGECSlice is less than another.
+func (ls LGECSlice) Less(i, j int) bool { return ls[i] < ls[j] }
+
+// Swap swaps two elements of an LGECSLice.
+func (ls LGECSlice) Swap(i, j int) { ls[i], ls[j] = ls[j], ls[i] }
+
+// Sort sorts an LGECSlice in ascending order.
+func (ls LGECSlice) Sort() { sort.Sort(ls) }
+
+// Search searches for x in a sorted LGECSlice and returns the index as
+// specified by sort.Search.  The return value is the index to insert x if x is
+// not present.  (It can be len(ls).)  The slice must be sorted in ascending
+// order.
+func (ls LGECSlice) Search(x LGEC) int {
+	return sort.Search(len(ls), func(i int) bool { return ls[i] >= x })
 }
