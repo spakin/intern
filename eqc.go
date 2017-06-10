@@ -26,16 +26,6 @@ func init() {
 	eqc.forgetAll()
 }
 
-// PreEqC provides advance notice of a string that will be interned using
-// NewSymbolEqC.  A provided function canonicalizes the string.  Batching up a
-// large number of PreEqC calls before calling NewSymbolEqC helps avoid
-// running out of symbols that are properly comparable with all other symbols.
-func PreEqC(s string, f func(string) string) {
-	eqc.Lock()
-	eqc.pending = append(eqc.pending, f(s))
-	eqc.Unlock()
-}
-
 // NewEqC maps a string to an EqC symbol.  It guarantees that two strings
 // that are equal after being passed through a function f will return the same
 // EqC.
