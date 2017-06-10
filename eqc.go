@@ -16,7 +16,7 @@ import (
 // It is strongly recommended that programs alias EqC once for each
 // transformation function.  This will help the compiler catch program errors
 // if strings interned using different transformation functions are compared.
-type EqC Eq
+type EqC uint64
 
 // eqc maintains all the state needed to manipulate EqCs.
 var eqc state
@@ -26,9 +26,8 @@ func init() {
 	eqc.forgetAll()
 }
 
-// NewEqC maps a string to an EqC symbol.  It guarantees that two strings
-// that are equal after being passed through a function f will return the same
-// EqC.
+// NewEqC maps a string to an EqC symbol.  It guarantees that two strings that
+// are equal after being passed through a function f will return the same EqC.
 func NewEqC(s string, f func(string) string) EqC {
 	var err error
 	st := &eqc
