@@ -2,22 +2,10 @@
 
 package intern
 
-// ForgetAllEq provides access to the package-internal forgetAllEq function.
-func ForgetAllEq() {
+// ForgetEverything invokes all of the package-internal forgetAll* functions.
+func ForgetEverything() {
+	eq.forgetAll()
+	eqc.forgetAll()
 	lge.forgetAll()
-}
-
-// ForgetAllEqC provides access to the package-internal forgetAllEqC function.
-func ForgetAllEqC() {
-	lgec.forgetAll()
-}
-
-// ForgetAllLGE provides access to the package-internal forgetAllLGE function.
-func ForgetAllLGE() {
-	lge.forgetAll()
-}
-
-// ForgetAllLGEC provides access to the package-internal forgetAllLGEC function.
-func ForgetAllLGEC() {
 	lgec.forgetAll()
 }

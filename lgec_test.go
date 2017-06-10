@@ -15,7 +15,7 @@ import (
 // TestPreLGECDups tests if we can create a large number of symbols for which
 // duplicates are certain to occur.
 func TestPreLGECDups(t *testing.T) {
-	intern.ForgetAllLGEC()
+	intern.ForgetEverything()
 	const sLen = 3                        // Symbol length in characters
 	const nSymbols = 1000000              // Must be greater than len(charSet) choose sLen
 	prng := rand.New(rand.NewSource(910)) // Constant for reproducibility
@@ -31,7 +31,7 @@ func TestPreLGECDups(t *testing.T) {
 // TestPreLGECNoDups tests if we can create a large number of symbols for which
 // duplicates are extremely unlikely to occur.
 func TestPreLGECNoDups(t *testing.T) {
-	intern.ForgetAllLGEC()
+	intern.ForgetEverything()
 	const sLen = 50                        // Symbol length in characters
 	const nSymbols = 100000                // Number of symbols to generate
 	prng := rand.New(rand.NewSource(1112)) // Constant for reproducibility
@@ -48,7 +48,7 @@ func TestPreLGECNoDups(t *testing.T) {
 // don't use PreLGEC.
 func TestNewLGECFull(t *testing.T) {
 	// Creating 64 symbols in alphabetical order should work.
-	intern.ForgetAllLGEC()
+	intern.ForgetEverything()
 	var i int
 	for i = 0; i < 64; i++ {
 		str := fmt.Sprintf("This is symbol #%03d.", i+1)
@@ -70,7 +70,7 @@ func TestNewLGECFull(t *testing.T) {
 // string comparisons.
 func TestLGECOrder(t *testing.T) {
 	// Create a bunch of random strings.
-	intern.ForgetAllLGEC()
+	intern.ForgetEverything()
 	f := strings.ToLower                   // Function to apply
 	const sLen = 10                        // Symbol length in characters
 	const nSymbols = 100                   // Number of symbols to generate
