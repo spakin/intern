@@ -1,4 +1,4 @@
-// This file includes unit tests for the Eq data type.
+// This file provides unit tests for the Eq data type.
 
 package intern_test
 

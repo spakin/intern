@@ -1,4 +1,4 @@
-// This file includes unit tests for the EqC data type.
+// This file provides unit tests for the EqC data type.
 
 package intern_test
 

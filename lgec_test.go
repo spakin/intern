@@ -1,4 +1,4 @@
-// This file includes unit tests for the LGEC data type.
+// This file provides unit tests for the LGEC data type.
 
 package intern_test
 
@@ -199,7 +199,7 @@ func TestLGECCase(t *testing.T) {
 func TestSortLGECs(t *testing.T) {
 	// Prepare the test.
 	f := reverseString                     // Function to apply
-	const ns = 10                          // Number of strings to generate
+	const ns = 1000                        // Number of strings to generate
 	strs := make(sort.StringSlice, ns)     // Original strings
 	syms := make(intern.LGECSlice, ns)     // Interned strings
 	prng := rand.New(rand.NewSource(1718)) // Constant for reproducibility
