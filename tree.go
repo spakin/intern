@@ -15,7 +15,7 @@ type tree struct {
 	right *tree  // Right child or nil
 }
 
-// insert inserts a strings into a tree, returning the new tree.
+// insert inserts a string into a tree, returning the new tree.
 func (t *tree) insert(s string) (*tree, error) {
 	return t.insertHelper(s, 1<<63, 1<<62)
 }
@@ -79,7 +79,7 @@ func (t *tree) insertManySorted(ss []string) (*tree, error) {
 			return nil, err
 		}
 	}
-	if mid+1 <= n {
+	if mid+1 < n {
 		tNew, err = tNew.insertManySorted(ss[mid+1:])
 		if err != nil {
 			return nil, err
