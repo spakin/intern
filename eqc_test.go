@@ -5,6 +5,7 @@ package intern_test
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -96,5 +97,36 @@ func TestEqCCase(t *testing.T) {
 	if numEqC != expected {
 		t.Fatalf("Expected %d case-insensitive comparisons but saw %d",
 			expected, numEqC)
+	}
+}
+
+// TestEqCConcurrent performs a bunch of accesses in parallel in an attempt to
+// expose race conditions.
+func TestEqCConcurrent(*testing.T) {
+	const symsPerThread = 100000
+	nThreads := runtime.NumCPU() * 2 // Oversubscribe CPUs by a factor of 2.
+	f := strings.ToTitle
+
+	// Spawn a number of goroutines.
+	begin := make(chan bool, nThreads)
+	done := make(chan bool, nThreads)
+	for j := 0; j < nThreads; j++ {
+		go func() {
+			prng := rand.New(rand.NewSource(2021)) // Constant for reproducibility and to invite conflicts
+			_ = <-begin
+			for i := 0; i < symsPerThread; i++ {
+				nc := prng.Intn(20) + 1 // Number of characters
+				_ = intern.NewEqC(randomString(prng, nc), f)
+			}
+			done <- true
+		}()
+	}
+
+	// Tell all goroutines to begin then wait for them all to finish.
+	for j := 0; j < nThreads; j++ {
+		begin <- true
+	}
+	for j := 0; j < nThreads; j++ {
+		_ = <-done
 	}
 }

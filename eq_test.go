@@ -5,6 +5,7 @@ package intern_test
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"testing"
 
 	"github.com/spakin/intern"
@@ -91,5 +92,35 @@ func TestEqCase(t *testing.T) {
 	if numEq != len(syms) {
 		t.Fatalf("Expected %d case-sensitive comparisons but saw %d",
 			len(syms), numEq)
+	}
+}
+
+// TestEqConcurrent performs a bunch of accesses in parallel in an attempt to
+// expose race conditions.
+func TestEqConcurrent(*testing.T) {
+	const symsPerThread = 100000
+	nThreads := runtime.NumCPU() * 2 // Oversubscribe CPUs by a factor of 2.
+
+	// Spawn a number of goroutines.
+	begin := make(chan bool, nThreads)
+	done := make(chan bool, nThreads)
+	for j := 0; j < nThreads; j++ {
+		go func() {
+			prng := rand.New(rand.NewSource(2021)) // Constant for reproducibility and to invite conflicts
+			_ = <-begin
+			for i := 0; i < symsPerThread; i++ {
+				nc := prng.Intn(20) + 1 // Number of characters
+				_ = intern.NewEq(randomString(prng, nc))
+			}
+			done <- true
+		}()
+	}
+
+	// Tell all goroutines to begin then wait for them all to finish.
+	for j := 0; j < nThreads; j++ {
+		begin <- true
+	}
+	for j := 0; j < nThreads; j++ {
+		_ = <-done
 	}
 }

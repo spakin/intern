@@ -5,6 +5,7 @@ package intern_test
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"sort"
 	"testing"
 
@@ -233,5 +234,43 @@ func TestSortLGEs(t *testing.T) {
 		if str != sym.String() {
 			t.Fatalf("Sorted arrays don't match (%q != %q)", str, sym.String())
 		}
+	}
+}
+
+// TestLGEConcurrent performs a bunch of accesses in parallel in an attempt to
+// expose race conditions.
+func TestLGEConcurrent(t *testing.T) {
+	const symsPerThread = 1000
+	nThreads := runtime.NumCPU() * 2 // Oversubscribe CPUs by a factor of 2.
+
+	// Spawn a number of goroutines.
+	begin := make(chan bool, nThreads)
+	done := make(chan bool, nThreads)
+	for j := 0; j < nThreads; j++ {
+		go func() {
+			_ = <-begin
+			prng := rand.New(rand.NewSource(2021)) // Constant for reproducibility and to invite conflicts
+			for i := 0; i < symsPerThread; i++ {
+				nc := prng.Intn(20) + 1 // Number of characters
+				intern.PreLGE(randomString(prng, nc))
+			}
+			prng = rand.New(rand.NewSource(2021)) // Restart from the same seed.
+			for i := 0; i < symsPerThread; i++ {
+				nc := prng.Intn(20) + 1 // Number of characters
+				_, err := intern.NewLGE(randomString(prng, nc))
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			done <- true
+		}()
+	}
+
+	// Tell all goroutines to begin then wait for them all to finish.
+	for j := 0; j < nThreads; j++ {
+		begin <- true
+	}
+	for j := 0; j < nThreads; j++ {
+		_ = <-done
 	}
 }
