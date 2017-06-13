@@ -3,6 +3,7 @@
 package intern_test
 
 import (
+	"math/rand"
 	"testing"
 )
 
@@ -45,5 +46,32 @@ func BenchmarkCompareSimilarStrings(b *testing.B) {
 				Dummy++
 			}
 		}
+	}
+}
+
+// BenchmarkMergeStringMaps measures the performance of retrieving a number of
+// strings from a map.
+func BenchmarkMergeStringMaps(b *testing.B) {
+	// Populate two maps.
+	prng := rand.New(rand.NewSource(2223)) // Constant for reproducibility
+	const sLen = 30                        // Symbol length in characters
+	type Empty struct{}
+	m1 := make(map[string]Empty, b.N)
+	m2 := make(map[string]Empty, b.N)
+	for i := 0; i < b.N; i++ {
+		s := randomString(prng, sLen)
+		m1[s] = Empty{}
+		s = randomString(prng, sLen)
+		m2[s] = Empty{}
+	}
+
+	// Start the clock then merge the two maps into a third.
+	m3 := make(map[string]Empty, 2*b.N)
+	b.ResetTimer()
+	for k := range m1 {
+		m3[k] = Empty{}
+	}
+	for k := range m2 {
+		m3[k] = Empty{}
 	}
 }

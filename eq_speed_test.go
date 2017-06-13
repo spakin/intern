@@ -3,6 +3,7 @@
 package intern_test
 
 import (
+	"math/rand"
 	"testing"
 
 	"github.com/spakin/intern"
@@ -67,5 +68,32 @@ func BenchmarkCompareSimilarEqs(b *testing.B) {
 				Dummy++
 			}
 		}
+	}
+}
+
+// BenchmarkMergeEqMaps measures the performance of retrieving a number of Eqs
+// from a map.
+func BenchmarkMergeEqMaps(b *testing.B) {
+	// Populate two maps.
+	prng := rand.New(rand.NewSource(2223)) // Constant for reproducibility
+	const sLen = 20                        // Symbol length in characters
+	type Empty struct{}
+	m1 := make(map[intern.Eq]Empty, b.N)
+	m2 := make(map[intern.Eq]Empty, b.N)
+	for i := 0; i < b.N; i++ {
+		s := randomString(prng, sLen)
+		m1[intern.NewEq(s)] = Empty{}
+		s = randomString(prng, sLen)
+		m2[intern.NewEq(s)] = Empty{}
+	}
+
+	// Start the clock then merge the two maps into a third.
+	m3 := make(map[intern.Eq]Empty, 2*b.N)
+	b.ResetTimer()
+	for k := range m1 {
+		m3[k] = Empty{}
+	}
+	for k := range m2 {
+		m3[k] = Empty{}
 	}
 }
