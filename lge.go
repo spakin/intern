@@ -21,9 +21,9 @@ func init() {
 }
 
 // PreLGE provides advance notice of a string that will be interned using
-// NewSymbolLGE.  A provided function canonicalizes the string.  Batching up a
-// large number of PreLGE calls before calling NewSymbolLGE helps avoid
-// running out of symbols that are properly comparable with all other symbols.
+// NewLGE.  Batching up a large number of PreLGE calls before calling NewLGE
+// helps avoid running out of symbols that are properly comparable with all
+// other symbols.
 func PreLGE(s string) {
 	lge.Lock()
 	lge.pending = append(lge.pending, s)

@@ -28,9 +28,9 @@ func init() {
 }
 
 // PreLGEC provides advance notice of a string that will be interned using
-// NewSymbolLGEC.  A provided function canonicalizes the string.  Batching up a
-// large number of PreLGEC calls before calling NewSymbolLGEC helps avoid
-// running out of symbols that are properly comparable with all other symbols.
+// NewLGEC.  A provided function canonicalizes the string.  Batching up a large
+// number of PreLGEC calls before calling NewLGEC helps avoid running out of
+// symbols that are properly comparable with all other symbols.
 func PreLGEC(s string, f func(string) string) {
 	lgec.Lock()
 	lgec.pending = append(lgec.pending, f(s))
