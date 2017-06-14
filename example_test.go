@@ -6,7 +6,7 @@ import (
 	"github.com/spakin/intern"
 )
 
-func ExamplePreLGE() {
+func ExampleNewEq() {
 	// Define some strings.  Note that these aren't unique.
 	sList := []string{
 		"Gunnar",
@@ -16,21 +16,23 @@ func ExamplePreLGE() {
 		"Gotthorm",
 		"Gjúki",
 		"Óttar",
-	}
-
-	// Indicate our intention to intern all of the above.
-	for _, s := range sList {
-		intern.PreLGE(s)
+		"Sigurd",
+		"Svanhild",
+		"Jörmunrek",
+		"Jónakr",
+		"Hamdir",
+		"Sörli",
+		"Jónakr",
+		"Kostbera",
+		"Snævar",
+		"Atli",
 	}
 
 	// Intern all symbols into a set.  Report any duplicates
 	// encountered.
-	seen := make(map[intern.LGE]struct{}, len(sList))
+	seen := make(map[intern.Eq]struct{}, len(sList))
 	for _, s := range sList {
-		sym, err := intern.NewLGE(s)
-		if err != nil {
-			panic(err)
-		}
+		sym := intern.NewEq(s)
 		if _, ok := seen[sym]; ok {
 			fmt.Println(sym)
 		}
@@ -39,4 +41,5 @@ func ExamplePreLGE() {
 
 	// Output:
 	// Gjúki
+	// Jónakr
 }
