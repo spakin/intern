@@ -28,10 +28,6 @@ func (st *state) forgetAll() {
 	st.Unlock()
 }
 
-// id is the identity function (string → string).  It's used when no string
-// canonicalization is required.
-func id(s string) string { return s }
-
 // toString converts a symbol back to a string.  It panics if given a symbol
 // that was not created using New*.
 func (st *state) toString(s uint64, ty string) string {
@@ -61,20 +57,18 @@ func (st *state) flushPending() error {
 }
 
 // assignSymbol assigns a new symbol to a string.  It takes as arguments the
-// string to assign, a canonicalization function, and a Boolean that indicates
-// whether to use a tree to preserve order.  This method returns the assigned
-// symbol and an error value.
-func (st *state) assignSymbol(s string, f func(string) string, useTree bool) (uint64, error) {
-	fs := f(s)
+// string to assign and a Boolean that indicates whether to use a tree to
+// preserve order.  This method returns the assigned symbol and an error value.
+func (st *state) assignSymbol(s string, useTree bool) (uint64, error) {
 	var sym uint64 // Symbol to assign to string s
 	if useTree {
 		// Assign the symbol using a tree to maintain order.
 		var err error
-		st.tree, err = st.tree.insert(fs)
+		st.tree, err = st.tree.insert(s)
 		if err != nil {
 			return 0, err
 		}
-		t := st.tree.find(fs)
+		t := st.tree.find(s)
 		if t == nil {
 			panic("Internal error: Failed to find a string just inserted into a tree")
 		}
@@ -83,14 +77,14 @@ func (st *state) assignSymbol(s string, f func(string) string, useTree bool) (ui
 		// Assign the next available number, starting at 1 to ensure
 		// that an uninitialized symbol is treated as invalid.
 		var ok bool
-		sym, ok = st.strToSym[fs]
+		sym, ok = st.strToSym[s]
 		if ok {
 			// The string was already assigned a symbol.
 			return sym, nil
 		}
 		sym = uint64(len(st.symToStr)) + 1
 	}
-	st.symToStr[sym] = s  // Use the original string when mapping a symbol to a string.
-	st.strToSym[fs] = sym // Use the transformed string when mapping a string to a symbol.
+	st.symToStr[sym] = s
+	st.strToSym[s] = sym
 	return sym, nil
 }

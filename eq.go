@@ -27,7 +27,7 @@ func NewEq(s string) Eq {
 	st := &eq
 	st.Lock()
 	defer st.Unlock()
-	sym, err := st.assignSymbol(s, id, false)
+	sym, err := st.assignSymbol(s, false)
 	if err != nil {
 		panic(fmt.Sprintf("Internal error: Unexpected error (%s)", err))
 	}

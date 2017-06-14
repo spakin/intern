@@ -5,7 +5,6 @@ package intern_test
 import (
 	"fmt"
 	"math/rand"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -47,9 +46,6 @@ var Dummy uint64
 
 // nComp is the number of strings to compare all the others to when benchmarking.
 const nComp = 1000
-
-// bMarkFunc is a string canonicalization function to use during benchmarking.
-var bMarkFunc = strings.ToUpper
 
 // generateSimilarStrings generates a list of strings that have a substantial
 // prefix in common.

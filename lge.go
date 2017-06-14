@@ -48,7 +48,7 @@ func NewLGE(s string) (LGE, error) {
 	}
 
 	// Insert the new symbol.
-	sym, err := st.assignSymbol(s, id, true)
+	sym, err := st.assignSymbol(s, true)
 	return LGE(sym), err
 }
 
