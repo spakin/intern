@@ -2,51 +2,25 @@ package intern_test
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/spakin/intern"
 )
 
-// Find all duplicates in a list of strings.
-func ExampleNewEq() {
-	// Define some strings.  Note that these aren't unique.
-	sList := []string{
-		"Gunnar",
-		"Högni",
-		"Gjúki",
-		"Gudrún",
-		"Gotthorm",
-		"Gjúki",
-		"Óttar",
-		"Sigurd",
-		"Svanhild",
-		"Jörmunrek",
-		"Jónakr",
-		"Hamdir",
-		"Sörli",
-		"Jónakr",
-		"Kostbera",
-		"Snævar",
-		"Atli",
-	}
+// LGESlice is a slice of LGEs that implements sort.Interface.
+type LGESlice []intern.LGE
 
-	// Intern all symbols into a set.  Report any duplicates
-	// encountered.
-	seen := make(map[intern.Eq]struct{}, len(sList))
-	for _, s := range sList {
-		sym := intern.NewEq(s)
-		if _, ok := seen[sym]; ok {
-			fmt.Println(sym)
-		}
-		seen[sym] = struct{}{}
-	}
+// Len returns the length of an LGESlice.
+func (ls LGESlice) Len() int { return len(ls) }
 
-	// Output:
-	// Gjúki
-	// Jónakr
-}
+// Less reports whether one element of an LGESlice is less than another.
+func (ls LGESlice) Less(i, j int) bool { return ls[i] < ls[j] }
+
+// Swap swaps two elements of an LGESLice.
+func (ls LGESlice) Swap(i, j int) { ls[i], ls[j] = ls[j], ls[i] }
 
 // Sort a list of strings by interning them to LGE symbols.
-func ExampleLGESlice_Sort() {
+func ExamplePreLGE() {
 	// Define some strings.
 	sList := []string{
 		"Gerontius",
@@ -89,7 +63,7 @@ func ExampleLGESlice_Sort() {
 	}
 
 	// Intern each string into an LGE and store it in an LGESlice.
-	syms := make(intern.LGESlice, len(sList))
+	syms := make(LGESlice, len(sList))
 	for i, s := range sList {
 		l, err := intern.NewLGE(s)
 		if err != nil {
@@ -99,7 +73,7 @@ func ExampleLGESlice_Sort() {
 	}
 
 	// Sort the LGESlice and output the result.
-	syms.Sort()
+	sort.Sort(syms)
 	for _, s := range syms {
 		fmt.Println(s)
 	}
