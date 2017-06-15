@@ -1,6 +1,9 @@
 intern
 ======
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/spakin/intern)](https://goreportcard.com/report/github.com/spakin/intern) [![Build Status](https://travis-ci.org/spakin/intern.svg?branch=master)](https://travis-ci.org/spakin/intern) [![GoDoc](https://godoc.org/github.com/spakin/intern?status.svg)](https://godoc.org/github.com/spakin/intern)
+
+
 Description
 -----------
 

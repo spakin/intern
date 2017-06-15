@@ -34,7 +34,7 @@ mapped to an integer that respects comparisons with all existing symbols.  (In
 the current implementation, a worst-case sequence of NewLGE calls will fail on
 the 65th call.)  As a workaround, the package provides a PreLGE function that
 indicates an intention to invoke NewLGE on a particular string but without
-actually assigning an integer.  
+actually assigning an integer.
 
 Best practice is to pre-allocate as many LGE symbols as possible before calling
 NewLGE.  When NewLGE is called, all strings previously passed to PreLGE are

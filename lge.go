@@ -28,7 +28,7 @@ func PreLGE(s string) {
 
 // NewLGE maps a string to an LGE symbol.  It guarantees that two equal strings
 // will always map to the same LGE.  However, it is possible that the package
-// cannot accomodate a particular string, in which case NewLGE returns a
+// cannot accommodate a particular string, in which case NewLGE returns a
 // non-nil error.  Pre-allocate as many LGEs as possible using PreLGE to reduce
 // the likelihood of that happening.
 func NewLGE(s string) (LGE, error) {
