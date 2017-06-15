@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-// An Eq is a string that has been interned to an integer.  Eq
-// supports only equality comparisons, not inequality comparisons.
-// (No checks are performed to enforce that property, unfortunately.)
+// An Eq is a string that has been interned to an integer.  Eq supports only
+// equality and inequality comparisons, not greater than/less than comparisons.
+// (No checks are performed to enforce that usage model, unfortunately.)
 type Eq uint64
 
 // eq maintains all the state needed to manipulate Eqs.
