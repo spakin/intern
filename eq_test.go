@@ -63,6 +63,17 @@ func TestBadEq(t *testing.T) {
 	t.Fatalf("Failed to catch invalid intern.Eq %d", bad)
 }
 
+// TestForgetAllEqs ensures we panic when converting a forgotten Eq to a
+// string.
+func TestForgetAllEqs(t *testing.T) {
+	defer func() { _ = recover() }()
+	sym := intern.NewEq("old string")
+	str := sym.String()
+	intern.ForgetAllEqs()
+	str = sym.String() // Should panic
+	t.Fatalf("Failed to catch invalid intern.Eq %d (%q)", sym, str)
+}
+
 // TestEqCase ensures that symbol comparisons are case-sensitive.
 func TestEqCase(t *testing.T) {
 	// Convert a set of strings to Eqs.

@@ -14,7 +14,7 @@ import (
 // TestPreLGEDups tests if we can create a large number of symbols for which
 // duplicates are certain to occur.
 func TestPreLGEDups(t *testing.T) {
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	const sLen = 3                        // Symbol length in characters
 	const nSymbols = 1000000              // Must be greater than len(charSet) choose sLen
 	prng := rand.New(rand.NewSource(910)) // Constant for reproducibility
@@ -30,7 +30,7 @@ func TestPreLGEDups(t *testing.T) {
 // TestPreLGENoDups tests if we can create a large number of symbols for which
 // duplicates are extremely unlikely to occur.
 func TestPreLGENoDups(t *testing.T) {
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	const sLen = 50                        // Symbol length in characters
 	const nSymbols = 100000                // Number of symbols to generate
 	prng := rand.New(rand.NewSource(1112)) // Constant for reproducibility
@@ -47,7 +47,7 @@ func TestPreLGENoDups(t *testing.T) {
 // don't use PreLGE.
 func TestNewLGEFull(t *testing.T) {
 	// Creating 64 symbols in alphabetical order should work.
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	var i int
 	for i = 0; i < 64; i++ {
 		str := fmt.Sprintf("This is symbol #%03d.", i+1)
@@ -69,7 +69,7 @@ func TestNewLGEFull(t *testing.T) {
 // string comparisons.
 func TestLGEOrder(t *testing.T) {
 	// Create a bunch of random strings.
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	const sLen = 10                        // Symbol length in characters
 	const nSymbols = 100                   // Number of symbols to generate
 	prng := rand.New(rand.NewSource(1314)) // Constant for reproducibility
@@ -151,6 +151,20 @@ func TestBadLGE(t *testing.T) {
 	var bad intern.LGE
 	_ = bad.String() // Should panic
 	t.Fatalf("Failed to catch invalid intern.LGE %d", bad)
+}
+
+// TestForgetAllLGEs ensures we panic when converting a forgotten LGE to a
+// string.
+func TestForgetAllLGEs(t *testing.T) {
+	defer func() { _ = recover() }()
+	sym, err := intern.NewLGE("old string")
+	if err != nil {
+		t.Fatal(err)
+	}
+	str := sym.String()
+	intern.ForgetAllLGEs()
+	str = sym.String() // Should panic
+	t.Fatalf("Failed to catch invalid intern.LGE %d (%q)", sym, str)
 }
 
 // TestLGECase ensures that symbol comparisons are case-sensitive.

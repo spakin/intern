@@ -1,6 +1,8 @@
 /*
 Package intern maps strings to integers for fast comparisons.
 
+Description
+
 Consider the string "This is string one" stored in variable x and the string
 "This is string two" stored in variable y.  When a program tests if x == y, it
 compares their first characters and finds that both are "T".  It then compares
@@ -26,13 +28,15 @@ x, y, and z, also holds for sx, sy, and sz.
 A String method is defined for both Eq and LGE.  This maps a symbol back to its
 original string.  Ergo, no information is lost.
 
+Usage
+
 NewEq maps a string to an Eq symbol, and NewLGE maps a string to an LGE symbol.
-The former is faster and always succeeds (well, until the set of 64-bit
-integers is exhausted).  NewLGE, in addition to being slower, can fail if
-earlier assignments of integers to strings preclude a new string from being
-mapped to an integer that respects comparisons with all existing symbols.  (In
-the current implementation, a worst-case sequence of NewLGE calls will fail on
-the 65th call.)  As a workaround, the package provides a PreLGE function that
+The former is faster and always succeeds (until the set of 64-bit integers is
+exhausted).  NewLGE, in addition to being slower, can fail if earlier
+assignments of integers to strings preclude a new string from being mapped to
+an integer that respects comparisons with all existing symbols.  (In the
+current implementation, a worst-case sequence of NewLGE calls will fail on the
+65th call.)  As a workaround, the package provides a PreLGE function that
 indicates an intention to invoke NewLGE on a particular string but without
 actually assigning an integer.
 
@@ -43,6 +47,7 @@ preserved.  The process of pre-allocating LGE symbols with PreLGE and later
 allocating them with NewLGE can be repeated as many times as necessary but with
 increasing likelihood of failure with each repetition.
 
+All functions in this package are thread-safe.
 */
 package intern
 

@@ -28,7 +28,7 @@ func BenchmarkCompareRandomEqs(b *testing.B) {
 	}
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.Eq, len(strs))
-	intern.ForgetEverything()
+	intern.ForgetAllEqs()
 	for i, s := range strs {
 		syms[i] = intern.NewEq(s)
 	}
@@ -54,7 +54,7 @@ func BenchmarkCompareSimilarEqs(b *testing.B) {
 	}
 	strs := generateSimilarStrings(b.N)
 	syms := make([]intern.Eq, len(strs))
-	intern.ForgetEverything()
+	intern.ForgetAllEqs()
 	for i, s := range strs {
 		syms[i] = intern.NewEq(s)
 	}

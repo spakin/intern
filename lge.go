@@ -53,3 +53,10 @@ func NewLGE(s string) (LGE, error) {
 func (s LGE) String() string {
 	return lge.toString(uint64(s), "LGE")
 }
+
+// ForgetAllLGEs discards all existing mappings from strings to LGEs so the
+// associated memory can be reclaimed.  Use only when you know for sure that no
+// previously mapped LGEs will subsequently be used.
+func ForgetAllLGEs() {
+	lge.forgetAll()
+}

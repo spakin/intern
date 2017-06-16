@@ -39,3 +39,10 @@ func NewEq(s string) Eq {
 func (s Eq) String() string {
 	return eq.toString(uint64(s), "Eq")
 }
+
+// ForgetAllEqs discards all existing mappings from strings to Eqs so the
+// associated memory can be reclaimed.  Use only when you know for sure that no
+// previously mapped Eqs will subsequently be used.
+func ForgetAllEqs() {
+	eq.forgetAll()
+}

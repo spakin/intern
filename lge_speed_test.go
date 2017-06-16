@@ -34,7 +34,7 @@ func BenchmarkCompareRandomLGEs(b *testing.B) {
 	}
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.LGE, len(strs))
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	for _, s := range strs {
 		intern.PreLGE(s)
 	}
@@ -67,7 +67,7 @@ func BenchmarkCompareSimilarLGEs(b *testing.B) {
 	}
 	strs := generateSimilarStrings(b.N)
 	syms := make([]intern.LGE, len(strs))
-	intern.ForgetEverything()
+	intern.ForgetAllLGEs()
 	for _, s := range strs {
 		intern.PreLGE(s)
 	}
