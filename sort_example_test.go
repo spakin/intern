@@ -1,3 +1,5 @@
+// This file shows how to implement sort.Interface for LGE slices.
+
 package intern_test
 
 import (
