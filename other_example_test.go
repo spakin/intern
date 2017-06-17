@@ -1,7 +1,10 @@
 package intern_test
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/spakin/intern"
 )
@@ -43,4 +46,48 @@ func ExampleNewEq() {
 	// Output:
 	// Gjúki
 	// Jónakr
+}
+
+// Maintain a long list of symbols, remapping as necessary.
+func ExampleRemapAllLGEs() {
+	syms := make([]intern.LGE, 0, 10)
+	rb := bufio.NewReader(os.Stdin)
+	for {
+		// Read a line from standard input.
+		s, err := rb.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(err)
+		}
+		s = s[:len(s)-1]
+
+		// Map the symbol if we can.  For this example,
+		// pretend we need the symbol right away and therefore
+		// wouldn't benefit by pre-allocating it with
+		// intern.PreLGE.
+		sy, err := intern.NewLGE(s)
+		if err == nil {
+			syms = append(syms, sy)
+			continue
+		}
+
+		// The LGE symbol table is full.  Remap all existing
+		// symbols and try again.
+		intern.PreLGE(s)
+		m, err := intern.RemapAllLGEs()
+		if err != nil {
+			panic(err)
+		}
+		for i, sy := range syms {
+			syms[i] = m[sy]
+		}
+		sy, err = intern.NewLGE(s)
+		if err != nil {
+			panic(err)
+		}
+		syms = append(syms, sy)
+	}
+	fmt.Printf("%v\n", syms)
 }

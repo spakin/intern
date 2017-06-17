@@ -66,7 +66,7 @@ func ForgetAllLGEs() {
 }
 
 // RemapAllLGEs reassigns LGEs to strings to help clean up the mapping.  This
-// can make it possible to add strings that were previously rejected by NewLGE.
+// provides a way to add strings that were previously rejected by NewLGE.
 // RemapAllLGEs returns a mapping from old LGEs to new LGEs to assist programs
 // with updating LGEs that are in use.
 func RemapAllLGEs() (map[LGE]LGE, error) {
