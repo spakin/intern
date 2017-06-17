@@ -10,6 +10,7 @@ import (
 
 // BenchmarkLGECreation measures the time needed to create a symbol.
 func BenchmarkLGECreation(b *testing.B) {
+	intern.ForgetAllLGEs()
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.LGE, len(strs))
 	b.ResetTimer()
@@ -25,16 +26,29 @@ func BenchmarkLGECreation(b *testing.B) {
 	}
 }
 
+// BenchmarkMultiLGECreation measures the time needed to create multiple
+// symbols at once.
+func BenchmarkMultiLGECreation(b *testing.B) {
+	intern.ForgetAllLGEs()
+	strs := generateRandomStrings(b.N)
+	b.ResetTimer()
+	intern.PreLGEs(strs)
+	_, err := intern.NewLGEs(strs)
+	if err != nil {
+		b.Fatal(err)
+	}
+}
+
 // BenchmarkCompareRandomLGEs compares a number of long, randomly generated
 // strings by first mapping them to LGEs.
 func BenchmarkCompareRandomLGEs(b *testing.B) {
 	// Create N LGEs with random contents.
+	intern.ForgetAllLGEs()
 	if b.N < nComp {
 		return // Nothing to do
 	}
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.LGE, len(strs))
-	intern.ForgetAllLGEs()
 	for _, s := range strs {
 		intern.PreLGE(s)
 	}
@@ -62,12 +76,12 @@ func BenchmarkCompareRandomLGEs(b *testing.B) {
 // substantial prefix in common by first mapping them to LGEs.
 func BenchmarkCompareSimilarLGEs(b *testing.B) {
 	// Create LGEs for N mostly similar strings.
+	intern.ForgetAllLGEs()
 	if b.N < nComp {
 		return // Nothing to do
 	}
 	strs := generateSimilarStrings(b.N)
 	syms := make([]intern.LGE, len(strs))
-	intern.ForgetAllLGEs()
 	for _, s := range strs {
 		intern.PreLGE(s)
 	}

@@ -145,6 +145,39 @@ func TestLGEString(t *testing.T) {
 	}
 }
 
+// TestLGEStringMulti tests if we can convert strings to LGEs and back to
+// strings.  Unlike TestLGEString, it uses PreLGEs and NewLGEs.
+func TestLGEStringMulti(t *testing.T) {
+	// Prepare the test.
+	const ns = 10000                       // Number of strings to generate
+	strs := make([]string, ns)             // Original strings
+	prng := rand.New(rand.NewSource(1516)) // Constant for reproducibility
+
+	// Generate a bunch of strings.
+	for i := range strs {
+		nc := prng.Intn(20) + 1 // Number of characters
+		strs[i] = randomString(prng, nc)
+	}
+
+	// Intern each string to an LGE.
+	intern.PreLGEs(strs)
+	syms, err := intern.NewLGEs(strs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Ensure that converting an LGE back to a string is a lossless
+	// operation.  We use fmt.Sprintf as this represents a typical way an
+	// LGE might be converted to a string.
+	for i, str := range strs {
+		sym := syms[i]
+		sStr := fmt.Sprintf("%s", sym)
+		if str != sStr {
+			t.Fatalf("Expected %q but saw %q", str, sStr)
+		}
+	}
+}
+
 // TestBadLGE ensures we panic when converting an invalid LGE to a string.
 func TestBadLGE(t *testing.T) {
 	defer func() { _ = recover() }()

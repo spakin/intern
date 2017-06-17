@@ -28,18 +28,29 @@ func PreLGE(s string) {
 	lge.Unlock()
 }
 
+// PreLGEs performs the same operation as PreLGE but accepts a slice of strings
+// instead of an individual string.  This amortizes some costs when
+// pre-allocating a large number of LGEs at once.
+func PreLGEs(ss []string) {
+	lge.Lock()
+	lge.pending = append(lge.pending, ss...)
+	lge.Unlock()
+}
+
 // NewLGE maps a string to an LGE symbol.  It guarantees that two equal strings
 // will always map to the same LGE.  However, it is possible that the package
 // cannot accommodate a particular string, in which case NewLGE returns a
 // non-nil error.  Pre-allocate as many LGEs as possible using PreLGE to reduce
 // the likelihood of that happening.
 func NewLGE(s string) (LGE, error) {
+	// Acquire a lock on LGE state.
 	var err error
 	st := &lge
 	st.Lock()
 	defer st.Unlock()
 
 	// Flush any pending symbols.
+	lge.pending = append(lge.pending, s)
 	err = st.flushPending()
 	if err != nil {
 		return 0, err
@@ -48,6 +59,38 @@ func NewLGE(s string) (LGE, error) {
 	// Insert the new symbol.
 	sym, err := st.assignSymbol(s, true)
 	return LGE(sym), err
+}
+
+// NewLGEs performs the same operation as NewLGE but accepts a slice of strings
+// instead of an individual string.  This amortizes some costs when allocating
+// a large number of LGEs at once.
+func NewLGEs(ss []string) ([]LGE, error) {
+	// Acquire a lock on LGE state.
+	var err error
+	st := &lge
+	st.Lock()
+	defer st.Unlock()
+
+	// Flush any pending symbols.
+	syms := make([]LGE, len(ss))
+	if len(ss) == 0 {
+		return syms, nil
+	}
+	lge.pending = append(lge.pending, ss...)
+	err = st.flushPending()
+	if err != nil {
+		return syms, err
+	}
+
+	// Insert the new symbols.
+	for i, s := range ss {
+		sy, err := st.assignSymbol(s, true)
+		if err != nil {
+			return syms, err
+		}
+		syms[i] = LGE(sy)
+	}
+	return syms, nil
 }
 
 // String converts an LGE back to a string.  It panics if given an LGE that was

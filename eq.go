@@ -41,7 +41,7 @@ func (s Eq) String() string {
 }
 
 // ForgetAllEqs discards all existing mappings from strings to Eqs so the
-// associated memory can be reclaimed.  Use thsi function only when you know
+// associated memory can be reclaimed.  Use this function only when you know
 // for sure that no previously mapped Eqs will subsequently be used.
 func ForgetAllEqs() {
 	eq.Lock()

@@ -107,7 +107,14 @@ func (st *state) flushPending() error {
 // string to assign and a Boolean that indicates whether to use a tree to
 // preserve order.  This method returns the assigned symbol and an error value.
 func (st *state) assignSymbol(s string, useTree bool) (uint64, error) {
-	var sym uint64 // Symbol to assign to string s
+	// Check if the string was already assigned a symbol.
+	sym, ok := st.strToSym[s]
+	if ok {
+		// The string was already assigned a symbol.
+		return sym, nil
+	}
+
+	// We haven't seen this string before.  Find a symbol for it.
 	if useTree {
 		// Assign the symbol using a tree to maintain order.
 		var err error
@@ -123,12 +130,6 @@ func (st *state) assignSymbol(s string, useTree bool) (uint64, error) {
 	} else {
 		// Assign the next available number, starting at 1 to ensure
 		// that an uninitialized symbol is treated as invalid.
-		var ok bool
-		sym, ok = st.strToSym[s]
-		if ok {
-			// The string was already assigned a symbol.
-			return sym, nil
-		}
 		sym = uint64(len(st.symToStr)) + 1
 	}
 	st.symToStr[sym] = s
