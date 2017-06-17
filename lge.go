@@ -3,6 +3,8 @@
 
 package intern
 
+import "fmt"
+
 // An LGE is a string that has been interned to an integer.  An LGE supports
 // less than, greater than, and equal to comparisons (<, <=, >, >=, ==, !=)
 // with other LGEs.
@@ -55,8 +57,48 @@ func (s LGE) String() string {
 }
 
 // ForgetAllLGEs discards all existing mappings from strings to LGEs so the
-// associated memory can be reclaimed.  Use only when you know for sure that no
-// previously mapped LGEs will subsequently be used.
+// associated memory can be reclaimed.  Use this function only when you know
+// for sure that no previously mapped LGEs will subsequently be used.
 func ForgetAllLGEs() {
+	lge.Lock()
 	lge.forgetAll()
+	lge.Unlock()
+}
+
+// RemapAllLGEs reassigns LGEs to strings to help clean up the mapping.  This
+// can make it possible to add strings that were previously rejected by NewLGE.
+// RemapAllLGEs returns a mapping from old LGEs to new LGEs to assist programs
+// with updating LGEs that are in use.
+func RemapAllLGEs() (map[LGE]LGE, error) {
+	// Store the existing LGE state then reinitialize it.
+	lge.Lock()
+	defer lge.Unlock()
+	oldLge := state{
+		pending:  lge.pending,
+		strToSym: lge.strToSym,
+	}
+	lge.forgetAll()
+
+	// Append the old list of strings to the pending list.
+	lge.pending = oldLge.pending
+	for s := range oldLge.strToSym {
+		lge.pending = append(lge.pending, s)
+	}
+
+	// Map all pending strings to LGEs.
+	err := lge.flushPending()
+	if err != nil {
+		return nil, err
+	}
+
+	// Construct a map from old to new LGEs and return it.
+	m := make(map[LGE]LGE, len(lge.strToSym))
+	for str, oldSym := range oldLge.strToSym {
+		newSym, ok := lge.strToSym[str]
+		if !ok {
+			return nil, fmt.Errorf("Failed to remap string %q", str)
+		}
+		m[LGE(oldSym)] = LGE(newSym)
+	}
+	return m, nil
 }

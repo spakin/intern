@@ -68,12 +68,10 @@ type state struct {
 // forgetAll discards all extant string/symbol mappings and resets the
 // assignment tables to their initial state.
 func (st *state) forgetAll() {
-	st.Lock()
 	st.symToStr = make(map[uint64]string)
 	st.strToSym = make(map[string]uint64)
 	st.tree = nil
 	st.pending = make([]string, 0, 100)
-	st.Unlock()
 }
 
 // toString converts a symbol back to a string.  It panics if given a symbol
@@ -87,7 +85,8 @@ func (st *state) toString(s uint64, ty string) string {
 	panic(fmt.Sprintf("%d is not a valid intern.%s", s, ty))
 }
 
-// flushPending flushes all pending symbols.  It returns an error value.
+// flushPending flushes all pending symbols, converting strings to symbols.
+// The function returns an error status.
 func (st *state) flushPending() error {
 	var err error
 	if len(st.pending) > 0 {

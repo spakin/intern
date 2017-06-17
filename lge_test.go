@@ -240,3 +240,82 @@ func TestLGEConcurrent(t *testing.T) {
 		_ = <-done
 	}
 }
+
+// TestRemapAllLGEs tests that old strings are remapped and pending strings are
+// added.
+func TestRemapAllLGEs(t *testing.T) {
+	// Define a list of strings and allocate space for two lists of
+	// associated LGEs.
+	strs := []string{
+		"David J. Thouless",
+		"F. Duncan M. Haldane",
+		"J. Michael Kosterlitz",
+		"Jean-Pierre Sauvage",
+		"Sir J. Fraser Stoddart",
+		"Bernard L. Feringa",
+		"Yoshinori Ohsumi",
+		"Bob Dylan",
+		"Juan Manuel Santos",
+		"Oliver Hart",
+		"Bengt Holmström",
+	}
+	nStrs := len(strs)
+	syms0 := make([]intern.LGE, nStrs/2)
+	syms1 := make([]intern.LGE, nStrs)
+
+	// Generate symbols for half the names.
+	for i := 0; i < nStrs/2; i++ {
+		intern.PreLGE(strs[i])
+	}
+	var err error
+	for i := 0; i < nStrs/2; i++ {
+		syms0[i], err = intern.NewLGE(strs[i])
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	// Preallocate the remaining symbols (with a bit of overlap to test
+	// that, too), but don't actually allocate them.
+	for i := nStrs/2 - 1; i < nStrs; i++ {
+		intern.PreLGE(strs[i])
+	}
+
+	// Remap all old and pending symbols.
+	m, err := intern.RemapAllLGEs()
+	if err != nil {
+		t.Error(err)
+	}
+	for i, s := range strs {
+		syms1[i], err = intern.NewLGE(s)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	// Confirm that the map is accurate.
+	for i, s := range strs[:nStrs/2] {
+		s0 := syms0[i]
+		s1 := syms1[i]
+		if m[s0] != s1 {
+			t.Errorf("For %q, expected %d to map to %d but it instead mapped to %d",
+				s, s0, s1, m[s0])
+		}
+	}
+
+	// Confirm that all new LGEs compare with each other as expected.
+	for i, a0 := range strs {
+		b0 := syms1[i]
+		for j, a1 := range strs {
+			b1 := syms1[j]
+			switch {
+			case a0 == a1 && b0 == b1:
+			case a0 < a1 && b0 < b1:
+			case a0 > a1 && b0 > b1:
+			default:
+				t.Errorf("Comparison of strings %q and %q does not match comparison of LGEs %d and %d",
+					a0, a1, b0, b1)
+			}
+		}
+	}
+}
