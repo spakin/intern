@@ -61,10 +61,10 @@ func NewLGE(s string) (LGE, error) {
 	return LGE(sym), err
 }
 
-// NewLGEs performs the same operation as NewLGE but accepts a slice of strings
-// instead of an individual string.  This amortizes some costs when allocating
-// a large number of LGEs at once.
-func NewLGEs(ss []string) ([]LGE, error) {
+// NewLGEMulti performs the same operation as NewLGE but accepts a slice of
+// strings instead of an individual string.  This amortizes some costs when
+// allocating a large number of LGEs at once.
+func NewLGEMulti(ss []string) ([]LGE, error) {
 	// Acquire a lock on LGE state.
 	var err error
 	st := &lge
