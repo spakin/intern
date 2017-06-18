@@ -59,6 +59,18 @@ import (
 // symbol represents either package symbol type (Eq or LGE).
 type symbol uint64
 
+// symbolList is a list of symbols.  It implements sort.Interface.
+type symbolList []symbol
+
+// Len returns the length of a symbolList.
+func (sl symbolList) Len() int { return len(sl) }
+
+// Less says is one symbolList element is less than another.
+func (sl symbolList) Less(i, j int) bool { return sl[i] < sl[j] }
+
+// Swap swaps two elements of a symbolList.
+func (sl symbolList) Swap(i, j int) { sl[i], sl[j] = sl[j], sl[i] }
+
 // state includes all the state needed to manipulate all interned-string types.
 type state struct {
 	symToStr     map[symbol]string // Mapping from symbols to strings
@@ -93,15 +105,16 @@ func (st *state) toString(s symbol, ty string) string {
 func (st *state) flushPending() error {
 	var err error
 	if len(st.pending) > 0 {
-		st.tree, err = st.tree.insertMany(st.pending)
+		var sMap map[string]symbol
+		st.tree, sMap, err = st.tree.insertMany(st.pending)
 		if err != nil {
 			return err
 		}
 		st.pending = st.pending[:0]
-		st.tree.walk(func(t *tree) {
-			st.symToStr[t.sym] = t.str
-			st.strToSym[t.str] = t.sym
-		})
+		for k, v := range sMap {
+			st.strToSym[k] = v
+			st.symToStr[v] = k
+		}
 	}
 	return nil
 }
@@ -121,15 +134,10 @@ func (st *state) assignSymbol(s string, useTree bool) (symbol, error) {
 	if useTree {
 		// Assign the symbol using a tree to maintain order.
 		var err error
-		st.tree, err = st.tree.insert(s)
+		st.tree, sym, err = st.tree.insert(s)
 		if err != nil {
 			return 0, err
 		}
-		t := st.tree.find(s)
-		if t == nil {
-			panic("Internal error: Failed to find a string just inserted into a tree")
-		}
-		sym = t.sym
 	} else {
 		// Assign the next available number, starting at 1 to ensure
 		// that an uninitialized symbol is treated as invalid.
