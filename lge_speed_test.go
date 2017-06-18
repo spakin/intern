@@ -32,7 +32,7 @@ func BenchmarkMultiLGECreation(b *testing.B) {
 	intern.ForgetAllLGEs()
 	strs := generateRandomStrings(b.N)
 	b.ResetTimer()
-	intern.PreLGEs(strs)
+	intern.PreLGEMulti(strs)
 	_, err := intern.NewLGEMulti(strs)
 	if err != nil {
 		b.Fatal(err)

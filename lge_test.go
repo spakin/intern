@@ -146,7 +146,7 @@ func TestLGEString(t *testing.T) {
 }
 
 // TestLGEStringMulti tests if we can convert strings to LGEs and back to
-// strings.  Unlike TestLGEString, it uses PreLGEs and NewLGEMulti.
+// strings.  Unlike TestLGEString, it uses PreLGEMulti and NewLGEMulti.
 func TestLGEStringMulti(t *testing.T) {
 	// Prepare the test.
 	const ns = 10000                       // Number of strings to generate
@@ -160,7 +160,7 @@ func TestLGEStringMulti(t *testing.T) {
 	}
 
 	// Intern each string to an LGE.
-	intern.PreLGEs(strs)
+	intern.PreLGEMulti(strs)
 	syms, err := intern.NewLGEMulti(strs)
 	if err != nil {
 		t.Fatal(err)

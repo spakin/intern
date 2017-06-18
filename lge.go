@@ -28,10 +28,10 @@ func PreLGE(s string) {
 	lge.Unlock()
 }
 
-// PreLGEs performs the same operation as PreLGE but accepts a slice of strings
-// instead of an individual string.  This amortizes some costs when
+// PreLGEMulti performs the same operation as PreLGE but accepts a slice of
+// strings instead of an individual string.  This amortizes some costs when
 // pre-allocating a large number of LGEs at once.
-func PreLGEs(ss []string) {
+func PreLGEMulti(ss []string) {
 	lge.Lock()
 	lge.pending = append(lge.pending, ss...)
 	lge.Unlock()
