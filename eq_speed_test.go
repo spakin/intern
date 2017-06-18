@@ -11,6 +11,7 @@ import (
 
 // BenchmarkEqCreation measures the time needed to create a symbol.
 func BenchmarkEqCreation(b *testing.B) {
+	intern.ForgetAllEqs()
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.Eq, len(strs))
 	b.ResetTimer()
@@ -19,16 +20,25 @@ func BenchmarkEqCreation(b *testing.B) {
 	}
 }
 
+// BenchmarkMultiEqCreation measures the time needed to create multiple symbols
+// at once.
+func BenchmarkMultiEqCreation(b *testing.B) {
+	intern.ForgetAllEqs()
+	strs := generateRandomStrings(b.N)
+	b.ResetTimer()
+	_ = intern.NewEqMulti(strs)
+}
+
 // BenchmarkCompareRandomEqs compares a number of long, randomly generated
 // strings by first mapping them to Eqs.
 func BenchmarkCompareRandomEqs(b *testing.B) {
 	// Create N Eqs with random contents.
+	intern.ForgetAllEqs()
 	if b.N < nComp {
 		return // Nothing to do
 	}
 	strs := generateRandomStrings(b.N)
 	syms := make([]intern.Eq, len(strs))
-	intern.ForgetAllEqs()
 	for i, s := range strs {
 		syms[i] = intern.NewEq(s)
 	}
@@ -49,12 +59,12 @@ func BenchmarkCompareRandomEqs(b *testing.B) {
 // substantial prefix in common by first mapping them to Eqs.
 func BenchmarkCompareSimilarEqs(b *testing.B) {
 	// Create Eqs for N mostly similar strings.
+	intern.ForgetAllEqs()
 	if b.N < nComp {
 		return // Nothing to do
 	}
 	strs := generateSimilarStrings(b.N)
 	syms := make([]intern.Eq, len(strs))
-	intern.ForgetAllEqs()
 	for i, s := range strs {
 		syms[i] = intern.NewEq(s)
 	}
@@ -75,6 +85,7 @@ func BenchmarkCompareSimilarEqs(b *testing.B) {
 // from a map.
 func BenchmarkMergeEqMaps(b *testing.B) {
 	// Populate two maps.
+	intern.ForgetAllEqs()
 	prng := rand.New(rand.NewSource(2223)) // Constant for reproducibility
 	const sLen = 20                        // Symbol length in characters
 	type Empty struct{}

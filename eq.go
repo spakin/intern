@@ -23,15 +23,30 @@ func init() {
 // NewEq maps a string to an Eq symbol.  It guarantees that two equal strings
 // will always map to the same Eq.
 func NewEq(s string) Eq {
-	var err error
-	st := &eq
-	st.Lock()
-	defer st.Unlock()
-	sym, err := st.assignSymbol(s, false)
+	eq.Lock()
+	defer eq.Unlock()
+	sym, err := eq.assignSymbol(s, false)
 	if err != nil {
 		panic(fmt.Sprintf("Internal error: Unexpected error (%s)", err))
 	}
 	return Eq(sym)
+}
+
+// NewEqMulti performs the same operation as NewEq but accepts a slice of
+// strings instead of an individual string.  This amortizes some costs when
+// allocating a large number of Eqs at once.
+func NewEqMulti(ss []string) []Eq {
+	eq.Lock()
+	defer eq.Unlock()
+	syms := make([]Eq, len(ss))
+	for i, s := range ss {
+		sym, err := eq.assignSymbol(s, false)
+		if err != nil {
+			panic(fmt.Sprintf("Internal error: Unexpected error (%s)", err))
+		}
+		syms[i] = Eq(sym)
+	}
+	return syms
 }
 
 // String converts an Eq back to a string.  It panics if given an Eq that was

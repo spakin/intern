@@ -54,6 +54,35 @@ func TestEqString(t *testing.T) {
 	}
 }
 
+// TestEqStringMulti tests if we can convert strings to symbols and back to
+// strings.  Unlike TestEqString, TestEqStringMulti uses NewEqMulti.
+func TestEqStringMulti(t *testing.T) {
+	// Prepare the test.
+	const ns = 10000                     // Number of strings to generate
+	strs := make([]string, ns)           // Original strings
+	prng := rand.New(rand.NewSource(34)) // Constant for reproducibility
+
+	// Generate a bunch of strings.
+	for i := range strs {
+		nc := prng.Intn(20) + 1 // Number of characters
+		strs[i] = randomString(prng, nc)
+	}
+
+	// Intern each string to an Eq.
+	syms := intern.NewEqMulti(strs)
+
+	// Ensure that converting an Eq back to a string is a lossless
+	// operation.  We use fmt.Sprintf as this represents a typical way an
+	// Eq might be converted to a string.
+	for i, str := range strs {
+		sym := syms[i]
+		sStr := fmt.Sprintf("%s", sym)
+		if str != sStr {
+			t.Fatalf("Expected %q but saw %q", str, sStr)
+		}
+	}
+}
+
 // TestBadEq ensures we panic when converting an invalid Eq to a
 // string.
 func TestBadEq(t *testing.T) {
