@@ -26,7 +26,7 @@ and 29519, respectively.  Let's call these sx, sy, and sz.  Then, x > y and sx
 x, y, and z, also holds for sx, sy, and sz.
 
 A String method is defined for both Eq and LGE.  This maps a symbol back to its
-original string.  Ergo, no information is lost.
+original string.  Ergo, no information is lost when mapping strings to symbols.
 
 Usage
 
@@ -45,7 +45,10 @@ NewLGE.  When NewLGE is called, all strings previously passed to PreLGE are
 assigned integers in an order that helps ensure that the desired relations are
 preserved.  The process of pre-allocating LGE symbols with PreLGE and later
 allocating them with NewLGE can be repeated as many times as necessary but with
-increasing likelihood of failure with each repetition.
+increasing likelihood of failure with each repetition.  If NewLGE does fail,
+the RemapAllLGEs function can be called to completely redo the mapping from
+strings to LGE symbols.  The program will need to update any live LGE symbols
+it has stored in data structures.
 
 All functions in this package are thread-safe.
 */
