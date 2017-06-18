@@ -8,7 +8,7 @@ import "fmt"
 // An LGE is a string that has been interned to an integer.  An LGE supports
 // less than, greater than, and equal to comparisons (<, <=, >, >=, ==, !=)
 // with other LGEs.
-type LGE uint64
+type LGE symbol
 
 // lge maintains all the state needed to manipulate LGEs.
 var lge state
@@ -96,7 +96,7 @@ func NewLGEs(ss []string) ([]LGE, error) {
 // String converts an LGE back to a string.  It panics if given an LGE that was
 // not created using NewLGE.
 func (s LGE) String() string {
-	return lge.toString(uint64(s), "LGE")
+	return lge.toString(symbol(s), "LGE")
 }
 
 // ForgetAllLGEs discards all existing mappings from strings to LGEs so the

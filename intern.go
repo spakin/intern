@@ -56,10 +56,13 @@ import (
 	"sync"
 )
 
+// symbol represents either package symbol type (Eq or LGE).
+type symbol uint64
+
 // state includes all the state needed to manipulate all interned-string types.
 type state struct {
-	symToStr     map[uint64]string // Mapping from symbols to strings
-	strToSym     map[string]uint64 // Mapping from strings to symbols
+	symToStr     map[symbol]string // Mapping from symbols to strings
+	strToSym     map[string]symbol // Mapping from strings to symbols
 	tree         *tree             // Tree for maintaining symbols assignments
 	pending      []string          // Strings not yet mapped to symbols
 	sync.RWMutex                   // Mutex protecting all of the above
@@ -68,15 +71,15 @@ type state struct {
 // forgetAll discards all extant string/symbol mappings and resets the
 // assignment tables to their initial state.
 func (st *state) forgetAll() {
-	st.symToStr = make(map[uint64]string)
-	st.strToSym = make(map[string]uint64)
+	st.symToStr = make(map[symbol]string)
+	st.strToSym = make(map[string]symbol)
 	st.tree = nil
 	st.pending = make([]string, 0, 100)
 }
 
 // toString converts a symbol back to a string.  It panics if given a symbol
 // that was not created using New*.
-func (st *state) toString(s uint64, ty string) string {
+func (st *state) toString(s symbol, ty string) string {
 	st.RLock()
 	defer st.RUnlock()
 	if str, ok := st.symToStr[s]; ok {
@@ -106,7 +109,7 @@ func (st *state) flushPending() error {
 // assignSymbol assigns a new symbol to a string.  It takes as arguments the
 // string to assign and a Boolean that indicates whether to use a tree to
 // preserve order.  This method returns the assigned symbol and an error value.
-func (st *state) assignSymbol(s string, useTree bool) (uint64, error) {
+func (st *state) assignSymbol(s string, useTree bool) (symbol, error) {
 	// Check if the string was already assigned a symbol.
 	sym, ok := st.strToSym[s]
 	if ok {
@@ -130,7 +133,7 @@ func (st *state) assignSymbol(s string, useTree bool) (uint64, error) {
 	} else {
 		// Assign the next available number, starting at 1 to ensure
 		// that an uninitialized symbol is treated as invalid.
-		sym = uint64(len(st.symToStr)) + 1
+		sym = symbol(len(st.symToStr)) + 1
 	}
 	st.symToStr[sym] = s
 	st.strToSym[s] = sym

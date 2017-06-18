@@ -10,7 +10,7 @@ import (
 // A tree represents a binary tree of strings.
 type tree struct {
 	str   string // Contents of this node
-	sym   uint64 // Symbol to assign to this string (LTE or LTEC)
+	sym   symbol // Symbol to assign to this string (LTE or LTEC)
 	left  *tree  // Left child or nil
 	right *tree  // Right child or nil
 }
@@ -22,7 +22,7 @@ func (t *tree) insert(s string) (*tree, error) {
 
 // insertHelper inserts a string into a tree, returning the new tree.  It
 // performs almost all of the work for the top-level insert method.
-func (t *tree) insertHelper(s string, val, incr uint64) (*tree, error) {
+func (t *tree) insertHelper(s string, val, incr symbol) (*tree, error) {
 	if t == nil {
 		return &tree{str: s, sym: val}, nil
 	}
