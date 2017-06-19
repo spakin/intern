@@ -51,6 +51,42 @@ strings to LGE symbols.  The program will need to update any live LGE symbols
 it has stored in data structures.
 
 All functions in this package are thread-safe.
+
+Performance
+
+It's tricky to discuss the speed of Eq and LGE symbol comparisons relative to
+string comparisons.  First, the time needed to compare two strings is a
+function of the length of the common prefix.  For example, comparing "Jonas
+Grumby" to "Roy Hinkley" is faster than comparing
+"antidisestablishmentarianism" to "antidisestablishmentarianist".  In contrast,
+symbol comparisons take the same amount of time regardless of the strings they
+represent.  Second, symbols must be allocated, which takes time (more for an
+LGE than an Eq).  Consequently, if few comparisons are performed per
+allocation, it may be faster to use strings than symbols.  As a further twist,
+the NewEqMulti and PreLGEMulti/NewLGEMulti functions help amortize some of the
+allocation costs when allocating multiple symbols at once, but not all programs
+have multiple strings they need to intern at once.  Third, there is a memory
+cost associated with maintaining a bidirectional mapping between strings and
+symbols.  If this extra memory causes a program's working set to expand beyond
+the size of a cache, it may be faster to use strings than symbols.
+
+The intern package includes a number of benchmarks to help programmers
+determine if it may be beneficial to use the package.  Run them in
+the usual manner:
+
+    go test --bench=. --run=None
+
+On my computer, the results show, very roughly, that
+
+1) for random strings (i.e., very short common prefixes), symbols are faster
+than strings if the program performs more than twice as many comparisons as Eq
+allocations or more than 13 times as many comparisons as LGE allocations, and
+that
+
+2) for very long, very similar strings (well over 100 initial characters in
+common), both Eq and LGE symbols are faster than strings if the program
+performs at least as many comparisons as symbol allocations.
+
 */
 package intern
 
