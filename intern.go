@@ -158,31 +158,12 @@ func (st *state) flushPending() error {
 	return nil
 }
 
-// assignSymbol assigns a new symbol to a string.  It takes as arguments the
-// string to assign and a Boolean that indicates whether to use a tree to
-// preserve order.  This method returns the assigned symbol and an error value.
-func (st *state) assignSymbol(s string, useTree bool) (symbol, error) {
-	// Check if the string was already assigned a symbol.
+// getSymbol looks up and returns the symbol associated with a string.  It
+// aborts the program on failure.
+func (st *state) getSymbol(s string) symbol {
 	sym, ok := st.strToSym[s]
-	if ok {
-		// The string was already assigned a symbol.
-		return sym, nil
+	if !ok {
+		panic(fmt.Sprintf("Internal error: Expected to find an interned version of %q", s))
 	}
-
-	// We haven't seen this string before.  Find a symbol for it.
-	if useTree {
-		// Assign the symbol using a tree to maintain order.
-		var err error
-		st.tree, sym, err = st.tree.insert(s)
-		if err != nil {
-			return 0, err
-		}
-	} else {
-		// Assign the next available number, starting at 1 to ensure
-		// that an uninitialized symbol is treated as invalid.
-		sym = symbol(len(st.symToStr)) + 1
-	}
-	st.symToStr[sym] = s
-	st.strToSym[s] = sym
-	return sym, nil
+	return sym
 }

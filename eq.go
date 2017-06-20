@@ -3,10 +3,6 @@
 
 package intern
 
-import (
-	"fmt"
-)
-
 // An Eq is a string that has been interned to an integer.  Eq supports only
 // equality and inequality comparisons, not greater than/less than comparisons.
 // (No checks are performed to enforce that usage model, unfortunately.)
@@ -20,16 +16,29 @@ func init() {
 	eq.forgetAll()
 }
 
+// assignEq assigns the next available Eq symbol to a string and returns the
+// new symbol.  If the string already has an Eq associated with it, return the
+// old Eq without allocating a new one.
+func assignEq(s string) Eq {
+	// Check if the string was already assigned a symbol.
+	sym, ok := eq.strToSym[s]
+	if ok {
+		return Eq(sym)
+	}
+
+	// We haven't seen this string before.  Find a symbol for it.
+	sym = symbol(len(eq.symToStr) + 1)
+	eq.symToStr[sym] = s
+	eq.strToSym[s] = sym
+	return Eq(sym)
+}
+
 // NewEq maps a string to an Eq symbol.  It guarantees that two equal strings
 // will always map to the same Eq.
 func NewEq(s string) Eq {
 	eq.Lock()
 	defer eq.Unlock()
-	sym, err := eq.assignSymbol(s, false)
-	if err != nil {
-		panic(fmt.Sprintf("Internal error: Unexpected error (%s)", err))
-	}
-	return Eq(sym)
+	return assignEq(s)
 }
 
 // NewEqMulti performs the same operation as NewEq but accepts a slice of
@@ -40,11 +49,7 @@ func NewEqMulti(ss []string) []Eq {
 	defer eq.Unlock()
 	syms := make([]Eq, len(ss))
 	for i, s := range ss {
-		sym, err := eq.assignSymbol(s, false)
-		if err != nil {
-			panic(fmt.Sprintf("Internal error: Unexpected error (%s)", err))
-		}
-		syms[i] = Eq(sym)
+		syms[i] = assignEq(s)
 	}
 	return syms
 }

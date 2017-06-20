@@ -45,20 +45,18 @@ func PreLGEMulti(ss []string) {
 func NewLGE(s string) (LGE, error) {
 	// Acquire a lock on LGE state.
 	var err error
-	st := &lge
-	st.Lock()
-	defer st.Unlock()
+	lge.Lock()
+	defer lge.Unlock()
 
-	// Flush any pending symbols.
+	// Mark the new string as pending then flush all pending symbols.
 	lge.pending = append(lge.pending, s)
-	err = st.flushPending()
+	err = lge.flushPending()
 	if err != nil {
 		return 0, err
 	}
 
-	// Insert the new symbol.
-	sym, err := st.assignSymbol(s, true)
-	return LGE(sym), err
+	// Return the new symbol
+	return LGE(lge.getSymbol(s)), nil
 }
 
 // NewLGEMulti performs the same operation as NewLGE but accepts a slice of
@@ -67,28 +65,23 @@ func NewLGE(s string) (LGE, error) {
 func NewLGEMulti(ss []string) ([]LGE, error) {
 	// Acquire a lock on LGE state.
 	var err error
-	st := &lge
-	st.Lock()
-	defer st.Unlock()
+	lge.Lock()
+	defer lge.Unlock()
 
-	// Flush any pending symbols.
+	// Mark all new strings as pending then flush all pending symbols.
 	syms := make([]LGE, len(ss))
 	if len(ss) == 0 {
 		return syms, nil
 	}
 	lge.pending = append(lge.pending, ss...)
-	err = st.flushPending()
+	err = lge.flushPending()
 	if err != nil {
 		return syms, err
 	}
 
-	// Insert the new symbols.
+	// Return the new symbols.
 	for i, s := range ss {
-		sy, err := st.assignSymbol(s, true)
-		if err != nil {
-			return syms, err
-		}
-		syms[i] = LGE(sy)
+		syms[i] = LGE(lge.getSymbol(s))
 	}
 	return syms, nil
 }
