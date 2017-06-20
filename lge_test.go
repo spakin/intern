@@ -178,6 +178,17 @@ func TestLGEStringMulti(t *testing.T) {
 	}
 }
 
+// TestLGEStringMultiEmpty tests if PreLGEMulti and NewLGEMulti can handle
+// empty slices.
+func TestLGEStringMultiEmpty(t *testing.T) {
+	strs := make([]string, 0)
+	intern.PreLGEMulti(strs)
+	_, err := intern.NewLGEMulti(strs)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 // TestBadLGE ensures we panic when converting an invalid LGE to a string.
 func TestBadLGE(t *testing.T) {
 	defer func() { _ = recover() }()

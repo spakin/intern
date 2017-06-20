@@ -46,7 +46,8 @@ func (t *tree) insertHelper(s string, val, incr symbol) (*tree, symbol, error) {
 
 // insertMany inserts a list of strings into a tree, attempting to maintain
 // balance as it does so.  A new tree, a map from strings to symbols, and an
-// error value are returned.
+// error value are returned.  It is assumed that the given list of strings is
+// non-empty.
 func (t *tree) insertMany(ss []string) (*tree, map[string]symbol, error) {
 	// Create a sorted version of the list of strings.
 	sss := make([]string, len(ss))
@@ -71,14 +72,11 @@ func (t *tree) insertMany(ss []string) (*tree, map[string]symbol, error) {
 
 // insertManySorted inserts a sorted list of strings into a tree, attempting to
 // maintain balance as it does so.  It performs most of the work for
-// insertMany.
+// insertMany.  It is assumed that the given list of strings is non-empty.
 func (t *tree) insertManySorted(ss []string) (*tree, symbolList, error) {
-	// Handle the easy cases first.
+	// Handle the base case (a single string) first.
 	n := len(ss)
-	switch n {
-	case 0:
-		return nil, symbolList{}, nil
-	case 1:
+	if n == 1 {
 		tNew, s, err := t.insert(ss[0])
 		return tNew, symbolList{s}, err
 	}
