@@ -166,33 +166,42 @@ func TestEqConcurrent(*testing.T) {
 	}
 }
 
-// TestEqMarshalJSON marshals Eqs to JSON and back and checks that the
-// output matches the input.
+// TestEqMarshalJSON marshals Eqs to JSON and back and checks that the outputs
+// match the input.
 func TestEqMarshalJSON(t *testing.T) {
-	// Create a long slice of Eqs.
-	iSyms := intern.NewEqMulti(ozChars)
+	for r, rStr := range []string{
+		"NoForget",
+		"Forget",
+	} {
+		t.Run(rStr, func(t *testing.T) {
+			// Create a long slice of Eqs.
+			intern.ForgetAllEqs()
+			iSyms := intern.NewEqMulti(ozChars)
 
-	// Encode the Eqs as JSON.
-	b, err := json.MarshalIndent(iSyms, "", "  ")
-	if err != nil {
-		t.Error(err)
-	}
+			// Encode the Eqs as JSON.
+			b, err := json.MarshalIndent(iSyms, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	// Convert the JSON back to a slice of Eqs.
-	var oSyms []intern.Eq
-	err = json.Unmarshal(b, &oSyms)
-	if err != nil {
-		t.Error(err)
-	}
+			// On our second iteration, forget our entire mapping.
+			if r == 1 {
+				intern.ForgetAllEqs()
+			}
 
-	// Ensure that both the inputs and the outputs match the original
-	// strings.
-	for i, s := range ozChars {
-		if s != iSyms[i].String() {
-			t.Errorf("Expected %q but saw input symbol %q", s, iSyms[i])
-		}
-		if s != oSyms[i].String() {
-			t.Errorf("Expected %q but saw input symbol %q", s, oSyms[i])
-		}
+			// Convert the JSON back to a slice of Eqs.
+			var oSyms []intern.Eq
+			err = json.Unmarshal(b, &oSyms)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Ensure that the outputs match the original strings.
+			for i, s := range ozChars {
+				if s != oSyms[i].String() {
+					t.Fatalf("Expected %q but saw input symbol %q", s, oSyms[i])
+				}
+			}
+		})
 	}
 }

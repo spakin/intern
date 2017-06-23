@@ -3,6 +3,7 @@
 package intern_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"runtime"
@@ -315,7 +316,7 @@ func TestRemapAllLGEs(t *testing.T) {
 	for i := 0; i < nStrs/2; i++ {
 		syms0[i], err = intern.NewLGE(strs[i])
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	}
 
@@ -328,12 +329,12 @@ func TestRemapAllLGEs(t *testing.T) {
 	// Remap all old and pending symbols.
 	m, err := intern.RemapAllLGEs()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	for i, s := range strs {
 		syms1[i], err = intern.NewLGE(s)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	}
 
@@ -342,7 +343,7 @@ func TestRemapAllLGEs(t *testing.T) {
 		s0 := syms0[i]
 		s1 := syms1[i]
 		if m[s0] != s1 {
-			t.Errorf("For %q, expected %d to map to %d but it instead mapped to %d",
+			t.Fatalf("For %q, expected %d to map to %d but it instead mapped to %d",
 				s, s0, s1, m[s0])
 		}
 	}
@@ -357,9 +358,58 @@ func TestRemapAllLGEs(t *testing.T) {
 			case a0 < a1 && b0 < b1:
 			case a0 > a1 && b0 > b1:
 			default:
-				t.Errorf("Comparison of strings %q and %q does not match comparison of LGEs %d and %d",
+				t.Fatalf("Comparison of strings %q and %q does not match comparison of LGEs %d and %d",
 					a0, a1, b0, b1)
 			}
 		}
+	}
+}
+
+// TestLGEMarshalJSON marshals LGEs to JSON and back and checks that the outputs
+// match the input.
+func TestLGEMarshalJSON(t *testing.T) {
+	for r, rStr := range []string{
+		"NoForget",
+		"Forget",
+	} {
+		t.Run(rStr, func(t *testing.T) {
+			// Create a long slice of LGEs.
+			intern.ForgetAllLGEs()
+			iSyms, err := intern.NewLGEMulti(ozChars)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Encode the LGEs as JSON.
+			b, err := json.MarshalIndent(iSyms, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// On our second iteration, forget our entire mapping.
+			if r == 1 {
+				intern.ForgetAllLGEs()
+			}
+
+			// Convert the JSON back to a slice of LGEs.
+			var oSyms []intern.LGE
+			for {
+				err = json.Unmarshal(b, &oSyms)
+				if err == nil {
+					break
+				}
+				_, err = intern.RemapAllLGEs()
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			// Ensure that the outputs match the original strings.
+			for i, s := range ozChars {
+				if s != oSyms[i].String() {
+					t.Fatalf("Expected %q but saw input symbol %q", s, oSyms[i])
+				}
+			}
+		})
 	}
 }

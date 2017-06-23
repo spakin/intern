@@ -138,3 +138,18 @@ func RemapAllLGEs() (map[LGE]LGE, error) {
 	}
 	return m, nil
 }
+
+// MarshalText converts an LGE to a string and that string to a slice of bytes.
+// With this method, LGE implements the encoding.TextMarshaler interface.
+func (s *LGE) MarshalText() ([]byte, error) {
+	return []byte(lge.toString(symbol(*s), "LGE")), nil
+}
+
+// UnmarshalText converts an slice of bytes to a string then interns that
+// string to an LGE.  With this method, LGE implements the
+// encoding.TextUnmarshaler interface.
+func (s *LGE) UnmarshalText(text []byte) error {
+	var err error
+	*s, err = NewLGE(string(text))
+	return err
+}
