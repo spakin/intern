@@ -68,3 +68,17 @@ func ForgetAllEqs() {
 	eq.forgetAll()
 	eq.Unlock()
 }
+
+// MarshalText converts an Eq to a string and that string to a slice of bytes.
+// With this method, Eq implements the encoding.TextMarshaler interface.
+func (s *Eq) MarshalText() ([]byte, error) {
+	return []byte(eq.toString(symbol(*s), "Eq")), nil
+}
+
+// UnmarshalText converts an slice of bytes to a string then interns that
+// string to an Eq.  With this method, Eq implements the
+// encoding.TextUnmarshaler interface.
+func (s *Eq) UnmarshalText(text []byte) error {
+	*s = NewEq(string(text))
+	return nil
+}

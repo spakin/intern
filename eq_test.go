@@ -3,6 +3,7 @@
 package intern_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"runtime"
@@ -162,5 +163,36 @@ func TestEqConcurrent(*testing.T) {
 	}
 	for j := 0; j < nThreads; j++ {
 		_ = <-done
+	}
+}
+
+// TestEqMarshalJSON marshals Eqs to JSON and back and checks that the
+// output matches the input.
+func TestEqMarshalJSON(t *testing.T) {
+	// Create a long slice of Eqs.
+	iSyms := intern.NewEqMulti(ozChars)
+
+	// Encode the Eqs as JSON.
+	b, err := json.MarshalIndent(iSyms, "", "  ")
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Convert the JSON back to a slice of Eqs.
+	var oSyms []intern.Eq
+	err = json.Unmarshal(b, &oSyms)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Ensure that both the inputs and the outputs match the original
+	// strings.
+	for i, s := range ozChars {
+		if s != iSyms[i].String() {
+			t.Errorf("Expected %q but saw input symbol %q", s, iSyms[i])
+		}
+		if s != oSyms[i].String() {
+			t.Errorf("Expected %q but saw input symbol %q", s, oSyms[i])
+		}
 	}
 }
