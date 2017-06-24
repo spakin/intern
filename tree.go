@@ -29,7 +29,12 @@ func (t *tree) insertHelper(s string, val, incr symbol) (*tree, symbol, error) {
 		return &tree{str: s, sym: val}, val, nil
 	}
 	if incr == 0 {
-		return nil, 0, fmt.Errorf("Unable to insert %q; sub-tree is full", s)
+		e := &PkgError{
+			Code: ErrTableFull,
+			Str:  s,
+			msg:  fmt.Sprintf("Unable to insert %q; symbol table is full", s),
+		}
+		return nil, 0, e
 	}
 	var sym symbol
 	var err error

@@ -132,7 +132,12 @@ func RemapAllLGEs() (map[LGE]LGE, error) {
 	for str, oldSym := range oldLge.strToSym {
 		newSym, ok := lge.strToSym[str]
 		if !ok {
-			return nil, fmt.Errorf("Failed to remap string %q", str)
+			e := &PkgError{
+				Code: ErrRemapFailed,
+				Str:  str,
+				msg:  fmt.Sprintf("Failed to remap string %q", str),
+			}
+			return nil, e
 		}
 		m[LGE(oldSym)] = LGE(newSym)
 	}

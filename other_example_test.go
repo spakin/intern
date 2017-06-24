@@ -52,6 +52,7 @@ func ExampleNewEq() {
 func ExampleRemapAllLGEs() {
 	syms := make([]intern.LGE, 0, 10)
 	rb := bufio.NewReader(os.Stdin)
+ReadInput:
 	for {
 		// Read a line from standard input.
 		s, err := rb.ReadString('\n')
@@ -68,9 +69,21 @@ func ExampleRemapAllLGEs() {
 		// wouldn't benefit by pre-allocating it with
 		// intern.PreLGE.
 		sy, err := intern.NewLGE(s)
-		if err == nil {
+		switch e := err.(type) {
+		case nil:
+			// No error: Continue with the next line.
 			syms = append(syms, sy)
-			continue
+			continue ReadInput
+
+		case *intern.PkgError:
+			// Package error: Ensure it's a full table.
+			if e.Code != intern.ErrTableFull {
+				panic(err)
+			}
+
+		default:
+			// Anything else: Abort.
+			panic(err)
 		}
 
 		// The LGE symbol table is full.  Remap all existing

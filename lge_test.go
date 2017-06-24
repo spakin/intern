@@ -391,15 +391,24 @@ func TestLGEMarshalJSON(t *testing.T) {
 				intern.ForgetAllLGEs()
 			}
 
-			// Convert the JSON back to a slice of LGEs.
+			// Convert the JSON back to a slice of LGEs.  If we
+			// fail, remap all of our LGEs and try again.
 			var oSyms []intern.LGE
+		KeepTrying:
 			for {
 				err = json.Unmarshal(b, &oSyms)
-				if err == nil {
-					break
-				}
-				_, err = intern.RemapAllLGEs()
-				if err != nil {
+				switch e := err.(type) {
+				case nil:
+					break KeepTrying
+				case *intern.PkgError:
+					if e.Code != intern.ErrTableFull {
+						t.Fatal(err)
+					}
+					_, err = intern.RemapAllLGEs()
+					if err != nil {
+						t.Fatal(err)
+					}
+				default:
 					t.Fatal(err)
 				}
 			}
