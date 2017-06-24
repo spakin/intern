@@ -158,3 +158,19 @@ func (s *LGE) UnmarshalText(text []byte) error {
 	*s, err = NewLGE(string(text))
 	return err
 }
+
+// MarshalBinary converts an LGE to a string and that string to a slice of
+// bytes.  With this method, LGE implements the encoding.BinaryMarshaler
+// interface.
+func (s *LGE) MarshalBinary() ([]byte, error) {
+	return []byte(lge.toString(symbol(*s), "LGE")), nil
+}
+
+// UnmarshalBinary converts an slice of bytes to a string then interns that
+// string to an LGE.  With this method, LGE implements the
+// encoding.BinaryUnmarshaler interface.
+func (s *LGE) UnmarshalBinary(data []byte) error {
+	var err error
+	*s, err = NewLGE(string(data))
+	return err
+}

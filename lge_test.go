@@ -3,6 +3,8 @@
 package intern_test
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -397,6 +399,68 @@ func TestLGEMarshalJSON(t *testing.T) {
 		KeepTrying:
 			for {
 				err = json.Unmarshal(b, &oSyms)
+				switch e := err.(type) {
+				case nil:
+					break KeepTrying
+				case *intern.PkgError:
+					if e.Code != intern.ErrTableFull {
+						t.Fatal(err)
+					}
+					_, err = intern.RemapAllLGEs()
+					if err != nil {
+						t.Fatal(err)
+					}
+				default:
+					t.Fatal(err)
+				}
+			}
+
+			// Ensure that the outputs match the original strings.
+			for i, s := range ozChars {
+				if s != oSyms[i].String() {
+					t.Fatalf("Expected %q but saw input symbol %q", s, oSyms[i])
+				}
+			}
+		})
+	}
+}
+
+// TestLGEMarshalGob marshals LGEs to a gob and back and checks that the
+// outputs match the input.
+func TestLGEMarshalGob(t *testing.T) {
+	for r, rStr := range []string{
+		"NoForget",
+		"Forget",
+	} {
+		t.Run(rStr, func(t *testing.T) {
+			// Create a long slice of LGEs.
+			intern.ForgetAllLGEs()
+			iSyms, err := intern.NewLGEMulti(ozChars)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Encode the LGEs as a gob.
+			var buf bytes.Buffer
+			enc := gob.NewEncoder(&buf)
+			err = enc.Encode(&iSyms)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// On our second iteration, forget our entire mapping.
+			if r == 1 {
+				intern.ForgetAllLGEs()
+			}
+
+			// Convert the gob back to a slice of LGEs.  If we
+			//  fail, remap all of our LGEs and try again.
+			var oSyms []intern.LGE
+			b := buf.Bytes()
+		KeepTrying:
+			for {
+				dec := gob.NewDecoder(bytes.NewBuffer(b))
+				err = dec.Decode(&oSyms)
 				switch e := err.(type) {
 				case nil:
 					break KeepTrying

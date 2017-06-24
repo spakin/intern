@@ -3,6 +3,8 @@
 package intern_test
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -192,6 +194,49 @@ func TestEqMarshalJSON(t *testing.T) {
 			// Convert the JSON back to a slice of Eqs.
 			var oSyms []intern.Eq
 			err = json.Unmarshal(b, &oSyms)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Ensure that the outputs match the original strings.
+			for i, s := range ozChars {
+				if s != oSyms[i].String() {
+					t.Fatalf("Expected %q but saw input symbol %q", s, oSyms[i])
+				}
+			}
+		})
+	}
+}
+
+// TestEqMarshalGob marshals Eqs to a gob and back and checks that the outputs
+// match the input.
+func TestEqMarshalGob(t *testing.T) {
+	for r, rStr := range []string{
+		"NoForget",
+		"Forget",
+	} {
+		t.Run(rStr, func(t *testing.T) {
+			// Create a long slice of Eqs.
+			intern.ForgetAllEqs()
+			iSyms := intern.NewEqMulti(ozChars)
+
+			// Encode the Eqs as a gob.
+			var buf bytes.Buffer
+			enc := gob.NewEncoder(&buf)
+			err := enc.Encode(&iSyms)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// On our second iteration, forget our entire mapping.
+			if r == 1 {
+				intern.ForgetAllEqs()
+			}
+
+			// Convert the gob back to a slice of Eqs.
+			var oSyms []intern.Eq
+			dec := gob.NewDecoder(&buf)
+			err = dec.Decode(&oSyms)
 			if err != nil {
 				t.Fatal(err)
 			}

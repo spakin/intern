@@ -82,3 +82,18 @@ func (s *Eq) UnmarshalText(text []byte) error {
 	*s = NewEq(string(text))
 	return nil
 }
+
+// MarshalBinary converts an Eq to a string and that string to a slice of
+// bytes.  With this method, Eq implements the encoding.BinaryMarshaler
+// interface.
+func (s *Eq) MarshalBinary() ([]byte, error) {
+	return []byte(eq.toString(symbol(*s), "Eq")), nil
+}
+
+// UnmarshalBinary converts an slice of bytes to a string then interns that
+// string to an Eq.  With this method, Eq implements the
+// encoding.BinaryUnmarshaler interface.
+func (s *Eq) UnmarshalBinary(data []byte) error {
+	*s = NewEq(string(data))
+	return nil
+}
