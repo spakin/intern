@@ -76,14 +76,13 @@ the usual manner:
 
     go test --bench=. --run=None
 
-On my computer, the results show, very roughly, that
+On my computer, the results show, very roughly, the following:
 
-1) for random strings (i.e., very short common prefixes), symbols are faster
+1) For random strings (i.e., very short common prefixes), symbols are faster
 than strings if the program performs more than twice as many comparisons as Eq
-allocations or more than 13 times as many comparisons as LGE allocations, and
-that
+allocations or more than 13 times as many comparisons as LGE allocations.
 
-2) for very long, very similar strings (well over 100 initial characters in
+2) For very long, very similar strings (well over 100 initial characters in
 common), both Eq and LGE symbols are faster than strings if the program
 performs at least as many comparisons as symbol allocations.
 

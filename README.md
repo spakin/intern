@@ -1,8 +1,7 @@
 intern
 ======
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/spakin/intern)](https://goreportcard.com/report/github.com/spakin/intern) [![Build Status](https://travis-ci.com/spakin/intern.svg?branch=master)](https://travis-ci.com/spakin/intern) [![GoDoc](https://godoc.org/github.com/spakin/intern?status.svg)](https://godoc.org/github.com/spakin/intern)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/spakin/intern)](https://goreportcard.com/report/github.com/spakin/intern) [![Build Status](https://travis-ci.com/spakin/intern.svg?branch=master)](https://travis-ci.com/spakin/intern) [![Go Reference](https://pkg.go.dev/badge/github.com/spakin/intern.svg)](https://pkg.go.dev/github.com/spakin/intern)
 
 Description
 -----------
@@ -16,16 +15,20 @@ More specifically, `intern` provides two symbol types: `Eq`, which supports only
 Installation
 ------------
 
-Instead of manually downloading and installing `intern` from GitHub, the recommended approach is to ensure your `GOPATH` environment variable is set properly then issue a
-```bash
-go get github.com/spakin/intern
+Assuming you're using the [Go module system](https://go.dev/blog/using-go-modules), simply import the package into your program with
+```Go
+import "github.com/spakin/intern"
 ```
-command.
+and run
+```bash
+go mod tidy
+```
+to download and install `intern`.
 
 Documentation
 -------------
 
-Descriptions and examples of the `intern` API can be found online in the [GoDoc documentation of package `intern`](https://godoc.org/github.com/spakin/intern).
+Descriptions and examples of the `intern` API can be found online in the [pkg.go.dev documentation](https://pkg.go.dev/github.com/spakin/intern).
 
 Author
 ------
